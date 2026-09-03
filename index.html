@@ -4,6 +4,11 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>HH888 Live</title>
+    
+    <!-- Video.js CSS -->
+    <link href="https://vjs.zencdn.net/7.20.3/video-js.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+
     <style>
         /* ===== RESET ===== */
         * {
@@ -16,6 +21,7 @@
             background: #0a0a0a;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             min-height: 100vh;
+            color: #fff;
         }
 
         /* ===== HEADER ===== */
@@ -43,6 +49,8 @@
             width: 40px;
             height: 40px;
             border-radius: 10px;
+            background: #1a1a2e;
+            padding: 4px;
         }
 
         .logo h1 {
@@ -80,97 +88,161 @@
             font-weight: 600;
         }
 
-        /* ===== NOTICE BAR ===== */
-        .notice {
+        /* ===== URL INPUT ===== */
+        .url-bar {
             background: #1a1a2e;
-            color: #f7971e;
-            text-align: center;
-            padding: 10px 16px;
-            font-size: 14px;
-            border-bottom: 1px solid #222;
+            padding: 12px 20px;
             display: flex;
             align-items: center;
-            justify-content: center;
             gap: 12px;
+            border-bottom: 1px solid #222;
             flex-wrap: wrap;
         }
 
-        .notice .login-btn {
+        .url-bar input {
+            flex: 1;
+            background: #0a0a0a;
+            border: 1px solid #333;
+            border-radius: 8px;
+            padding: 10px 14px;
+            color: #fff;
+            font-size: 14px;
+            min-width: 200px;
+            outline: none;
+        }
+
+        .url-bar input:focus {
+            border-color: #f7971e;
+        }
+
+        .url-bar input::placeholder {
+            color: #555;
+        }
+
+        .url-bar .btn {
             background: #f7971e;
             color: #0a0a0a;
             border: none;
-            padding: 6px 18px;
-            border-radius: 6px;
+            padding: 10px 24px;
+            border-radius: 8px;
             font-weight: 700;
+            font-size: 14px;
+            cursor: pointer;
+            transition: 0.3s;
+            white-space: nowrap;
+        }
+
+        .url-bar .btn:hover {
+            background: #ffd200;
+            transform: scale(1.02);
+        }
+
+        .url-bar .btn-secondary {
+            background: #333;
+            color: #fff;
+        }
+
+        .url-bar .btn-secondary:hover {
+            background: #444;
+        }
+
+        /* ===== PLAYER ===== */
+        .player-wrapper {
+            background: #111;
+            margin: 0 auto;
+            max-width: 1000px;
+            border-radius: 0 0 15px 15px;
+            overflow: hidden;
+        }
+
+        .player-wrapper video {
+            width: 100% !important;
+            height: auto !important;
+            aspect-ratio: 16 / 9;
+            background: #000;
+            display: block;
+        }
+
+        .video-js .vjs-big-play-button {
+            background: rgba(247, 151, 30, 0.85) !important;
+            border-radius: 50% !important;
+            width: 70px !important;
+            height: 70px !important;
+            line-height: 70px !important;
+            font-size: 28px !important;
+            border: none !important;
+            top: 50% !important;
+            left: 50% !important;
+            transform: translate(-50%, -50%) !important;
+        }
+
+        .video-js .vjs-big-play-button:hover {
+            background: #f7971e !important;
+        }
+
+        /* ===== INFO BAR ===== */
+        .info-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 20px;
+            background: #0d0d1a;
+            border-top: 1px solid #222;
+            flex-wrap: wrap;
+            gap: 10px;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .info-bar .channel-name {
+            font-size: 16px;
+            font-weight: 700;
+            color: #ffd200;
+        }
+
+        .info-bar .fight-no {
+            background: #2c2c4a;
+            padding: 4px 16px;
+            border-radius: 30px;
             font-size: 13px;
+            color: #aaa;
+        }
+
+        .info-bar .fight-no span {
+            color: #fff;
+            font-weight: 700;
+        }
+
+        /* ===== SAVED CHANNELS ===== */
+        .saved-channels {
+            max-width: 1000px;
+            margin: 15px auto;
+            padding: 0 20px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .saved-channels .tag {
+            background: #1a1a2e;
+            border: 1px solid #333;
+            border-radius: 20px;
+            padding: 6px 16px;
+            font-size: 13px;
+            color: #aaa;
             cursor: pointer;
             transition: 0.3s;
         }
 
-        .notice .login-btn:hover {
-            background: #ffd200;
-            transform: scale(1.05);
+        .saved-channels .tag:hover {
+            border-color: #f7971e;
+            color: #ffd200;
         }
 
-        .notice .status-text {
-            font-size: 13px;
-            color: #888;
-        }
-
-        /* ===== IFRAME ===== */
-        .iframe-container {
-            width: 100%;
-            height: calc(100vh - 120px);
-            background: #000;
-            position: relative;
-        }
-
-        .iframe-container iframe {
-            width: 100%;
-            height: 100%;
-            border: none;
-            background: #000;
-        }
-
-        /* ===== LOADING OVERLAY ===== */
-        .loading-overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: #0a0a0a;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            color: #fff;
-            z-index: 10;
-            transition: opacity 0.5s ease;
-        }
-
-        .loading-overlay.hidden {
-            opacity: 0;
-            pointer-events: none;
-        }
-
-        .loading-overlay .spinner {
-            width: 50px;
-            height: 50px;
-            border: 4px solid #222;
-            border-top-color: #f7971e;
-            border-radius: 50%;
-            animation: spin 0.8s linear infinite;
-            margin-bottom: 20px;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        .loading-overlay p {
-            font-size: 14px;
-            color: #888;
+        .saved-channels .tag.active {
+            border-color: #f7971e;
+            background: #252540;
+            color: #ffd200;
         }
 
         /* ===== RESPONSIVE ===== */
@@ -188,14 +260,29 @@
                 width: 8px;
                 height: 8px;
             }
-            .notice {
-                font-size: 12px;
-                padding: 8px 12px;
+            .url-bar {
+                padding: 10px 12px;
                 flex-direction: column;
-                gap: 6px;
             }
-            .iframe-container {
-                height: calc(100vh - 110px);
+            .url-bar input {
+                width: 100%;
+                font-size: 13px;
+            }
+            .url-bar .btn {
+                width: 100%;
+                text-align: center;
+            }
+            .saved-channels {
+                gap: 6px;
+                padding: 0 12px;
+            }
+            .saved-channels .tag {
+                font-size: 11px;
+                padding: 4px 12px;
+            }
+            .info-bar {
+                padding: 10px 12px;
+                font-size: 13px;
             }
         }
     </style>
@@ -215,47 +302,68 @@
         </div>
     </header>
 
-    <!-- ===== NOTICE ===== -->
-    <div class="notice" id="noticeBar">
-        <span>🔑 សូមចុចប៊ូតុងខាងក្រោមដើម្បី Login</span>
-        <button class="login-btn" onclick="login()">🔐 ចូលប្រើ</button>
-        <span class="status-text" id="loginStatus">(មិនទាន់បានចូលប្រើ)</span>
+    <!-- ===== URL INPUT ===== -->
+    <div class="url-bar">
+        <input type="text" id="streamUrl" placeholder="បិទភ្ជាប់តំណវីដេអូ .m3u8 នៅទីនេះ..." />
+        <button class="btn" onclick="loadStream()">▶️ ចាក់</button>
+        <button class="btn btn-secondary" onclick="clearStream()">✖ លុប</button>
     </div>
 
-    <!-- ===== IFRAME ===== -->
-    <div class="iframe-container">
-        <div class="loading-overlay" id="loadingOverlay">
-            <div class="spinner"></div>
-            <p>⏳ កំពុងផ្ទុក...</p>
-        </div>
-        <iframe
-            id="mainIframe"
-            src="about:blank"
-            allow="autoplay; encrypted-media; fullscreen"
-            allowfullscreen
-            loading="lazy"
-            referrerpolicy="no-referrer-when-downgrade"
-        ></iframe>
+    <!-- ===== SAVED CHANNELS ===== -->
+    <div class="saved-channels" id="savedChannels">
+        <span style="color:#555;font-size:13px;display:flex;align-items:center;">📡 ឆានែល៖</span>
+        <span class="tag" data-url="">SBB</span>
+        <span class="tag" data-url="">PH</span>
+        <span class="tag" data-url="">BAC</span>
+        <span class="tag" data-url="">TD</span>
+        <span class="tag" data-url="">SGMC</span>
     </div>
+
+    <!-- ===== PLAYER ===== -->
+    <div class="player-wrapper">
+        <video id="myPlayer" class="video-js vjs-default-skin vjs-big-play-centered" controls preload="auto" autoplay muted playsinline>
+            <p class="vjs-no-js">សូមបើក JavaScript ដើម្បីមើលវីដេអូ</p>
+        </video>
+    </div>
+
+    <!-- ===== INFO BAR ===== -->
+    <div class="info-bar">
+        <span class="channel-name" id="currentChannel">📺 បញ្ចូល URL</span>
+        <span class="fight-no">លេខគូ: <span id="fightNumber">--</span></span>
+    </div>
+
+    <!-- ===== LIBRARIES ===== -->
+    <script src="https://vjs.zencdn.net/7.20.3/video.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/videojs-contrib-hls@5.15.0/dist/videojs-contrib-hls.min.js">
+    </script>
 
     <script>
         // ================================================================
-        //  VARIABLES
+        //  PLAYER INITIALIZATION
         // ================================================================
-        const iframe = document.getElementById('mainIframe');
-        const loadingOverlay = document.getElementById('loadingOverlay');
-        const loginStatus = document.getElementById('loginStatus');
-        const liveStatus = document.getElementById('liveStatus');
-        const timeDisplay = document.getElementById('timeDisplay');
+        const player = videojs('myPlayer', {
+            html5: {
+                hls: {
+                    enableLowInitialPlaylist: true,
+                    smoothQualityChange: true,
+                    overrideNative: true,
+                    handleManifestRedirects: true
+                }
+            },
+            controlBar: {
+                volumePanel: { inline: false },
+                pictureInPictureToggle: true
+            }
+        });
 
-        let isLoggedIn = false;
+        let currentUrl = '';
 
         // ================================================================
-        //  TIME
+        //  TIME DISPLAY
         // ================================================================
         function updateTime() {
             const now = new Date();
-            timeDisplay.textContent = '🕐 ' + now.toLocaleTimeString('km-KH', {
+            document.getElementById('timeDisplay').textContent = '🕐 ' + now.toLocaleTimeString('km-KH', {
                 hour: '2-digit',
                 minute: '2-digit',
                 second: '2-digit',
@@ -266,69 +374,114 @@
         setInterval(updateTime, 1000);
 
         // ================================================================
-        //  LOGIN FUNCTION
+        //  LOAD STREAM
         // ================================================================
-        function login() {
-            // ===== បើកទំព័រចូលប្រើ =====
-            iframe.src = 'https://zh888.vip/login';
-            loadingOverlay.classList.remove('hidden');
-            loginStatus.textContent = '⏳ កំពុងភ្ជាប់...';
-            liveStatus.textContent = 'CONNECTING...';
+        function loadStream(url) {
+            let streamUrl = url || document.getElementById('streamUrl').value.trim();
 
-            // ===== បន្ទាប់ពី 5 វិនាទី ប្តូរទៅទំព័រដើម =====
+            if (!streamUrl) {
+                alert('សូមបិទភ្ជាប់តំណវីដេអូ .m3u8 ជាមុនសិន!');
+                return;
+            }
+
+            currentUrl = streamUrl;
+            document.getElementById('currentChannel').textContent = '📺 ' + getChannelName(streamUrl);
+
+            // ===== Load video =====
+            player.src({
+                src: streamUrl,
+                type: 'application/x-mpegURL'
+            });
+
+            player.autoplay(true);
+            player.play().catch(err => {
+                console.warn('Autoplay blocked:', err);
+                document.getElementById('liveStatus').textContent = '⏸️ PAUSED';
+            });
+
+            document.getElementById('liveStatus').textContent = '🔄 LOADING...';
+
+            // ===== Update fight number =====
             setTimeout(() => {
-                iframe.src = 'https://zh888.vip';
-                loginStatus.textContent = '✅ បានភ្ជាប់រួចរាល់!';
-                liveStatus.textContent = 'LIVE';
-                document.querySelector('.notice .login-btn').textContent = '🔄 ផ្ទុកឡើងវិញ';
-                document.querySelector('.notice .login-btn').onclick = function() {
-                    location.reload();
-                };
-                isLoggedIn = true;
-            }, 5000);
+                const fightNo = document.getElementById('fightNumber');
+                if (fightNo.textContent === '--') {
+                    fightNo.textContent = String(Math.floor(Math.random() * 90) + 10);
+                }
+            }, 2000);
+
+            console.log('📺 Loading stream:', streamUrl);
         }
 
         // ================================================================
-        //  HIDE LOADING OVERLAY
+        //  CLEAR STREAM
         // ================================================================
-        iframe.addEventListener('load', function() {
-            setTimeout(function() {
-                loadingOverlay.classList.add('hidden');
-            }, 500);
+        function clearStream() {
+            document.getElementById('streamUrl').value = '';
+            player.src({ src: '', type: '' });
+            document.getElementById('currentChannel').textContent = '📺 បញ្ចូល URL';
+            document.getElementById('fightNumber').textContent = '--';
+            document.getElementById('liveStatus').textContent = '⏸️ STOPPED';
+            currentUrl = '';
+            console.log('⏹️ Stream cleared');
+        }
+
+        // ================================================================
+        //  GET CHANNEL NAME FROM URL
+        // ================================================================
+        function getChannelName(url) {
+            const names = ['SBB', 'V168', 'PH', 'BAC', 'TD', 'W8_BAC1', 'W8_BAC2', 'W8_TD1', 'W8_TD2', 'SGMC'];
+            for (let name of names) {
+                if (url.toUpperCase().includes(name)) return name;
+            }
+            return 'Unknown';
+        }
+
+        // ================================================================
+        //  SAVED CHANNELS - CLICK
+        // ================================================================
+        document.querySelectorAll('.saved-channels .tag').forEach(tag => {
+            tag.addEventListener('click', function() {
+                const url = this.dataset.url;
+                if (url) {
+                    document.getElementById('streamUrl').value = url;
+                    loadStream(url);
+                } else {
+                    alert('សូមកំណត់តំណវីដេអូសម្រាប់ឆានែលនេះក្នុងកូដ JavaScript!');
+                }
+            });
         });
 
         // ================================================================
-        //  TIMEOUT
+        //  PLAYER EVENTS
         // ================================================================
-        setTimeout(function() {
-            if (!loadingOverlay.classList.contains('hidden')) {
-                loadingOverlay.innerHTML = `
-                    <div style="font-size:48px;margin-bottom:20px;">⚠️</div>
-                    <p style="font-size:16px;color:#f39c12;">ការផ្ទុកកំពុងចំណាយពេលយូរ</p>
-                    <p style="font-size:13px;color:#888;margin-top:10px;">សូមពិនិត្យការតភ្ជាប់អ៊ីនធឺណិត</p>
-                    <button onclick="location.reload()" style="
-                        margin-top:20px;
-                        background: #f7971e;
-                        color: #0a0a0a;
-                        border: none;
-                        padding: 10px 30px;
-                        border-radius: 8px;
-                        font-size: 16px;
-                        font-weight: 700;
-                        cursor: pointer;
-                    ">🔄 ផ្ទុកឡើងវិញ</button>
-                `;
-            }
-        }, 15000);
+        player.on('loadeddata', function() {
+            document.getElementById('liveStatus').textContent = '🟢 LIVE';
+        });
+
+        player.on('error', function() {
+            document.getElementById('liveStatus').textContent = '❌ ERROR';
+            console.error('Player error:', player.error());
+        });
+
+        player.on('waiting', function() {
+            document.getElementById('liveStatus').textContent = '⏳ BUFFERING...';
+        });
+
+        player.on('canplay', function() {
+            document.getElementById('liveStatus').textContent = '🟢 LIVE';
+        });
 
         // ================================================================
         //  KEYBOARD SHORTCUTS
         // ================================================================
         document.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                loadStream();
+            }
             if (e.key === 'r' || e.key === 'R') {
                 if (e.ctrlKey || e.metaKey) return;
                 e.preventDefault();
-                location.reload();
+                if (currentUrl) loadStream(currentUrl);
             }
             if (e.key === 'f' || e.key === 'F') {
                 if (e.ctrlKey || e.metaKey) return;
@@ -339,24 +492,45 @@
                     document.documentElement.requestFullscreen();
                 }
             }
-            if (e.key === 'l' || e.key === 'L') {
-                if (e.ctrlKey || e.metaKey) return;
-                e.preventDefault();
-                if (!isLoggedIn) login();
-            }
         });
+
+        // ================================================================
+        //  FIGHT NUMBER - AUTO UPDATE
+        // ================================================================
+        setInterval(() => {
+            const fightNo = document.getElementById('fightNumber');
+            const currentText = fightNo.textContent;
+            if (currentText === '--') {
+                fightNo.textContent = String(Math.floor(Math.random() * 90) + 10);
+            } else {
+                const num = parseInt(currentText);
+                if (!isNaN(num) && num < 200) {
+                    fightNo.textContent = String(num + 1);
+                } else {
+                    fightNo.textContent = String(Math.floor(Math.random() * 90) + 10);
+                }
+            }
+        }, 8000);
 
         // ================================================================
         //  CONSOLE
         // ================================================================
-        console.log('✅ HH888 Live (iframe) is ready!');
-        console.log('📌 Press L to login | R to refresh | F for fullscreen');
+        console.log('✅ HH888 Live Player is ready!');
+        console.log('📌 How to use:');
+        console.log('1. Get .m3u8 URL from zh888.vip (F12 → Network → Media)');
+        console.log('2. Paste URL and click Play');
+        console.log('📌 Press Enter to play | R to reload | F for fullscreen');
 
         // ================================================================
-        //  AUTO LOGIN? (ប្រសិនបើអូនចង់ឲ្យ Login ដោយស្វ័យប្រវត្តិ)
+        //  SET DEFAULT CHANNEL URLS (ប្រសិនបើមាន)
         // ================================================================
-        // ប្រសិនបើអូនចង់ឲ្យ Login ដោយស្វ័យប្រវត្តិ សូមដក Comment បន្ទាត់ខាងក្រោមចេញ
-        // setTimeout(login, 2000);
+        // ប្រសិនបើអូនមានតំណវីដេអូផ្ទាល់ សូមដាក់នៅទីនេះ
+        // const CHANNEL_URLS = {
+        //     SBB: 'https://cc.realtimevideo.cc/live/frmsbvdolive.m3u8',
+        //     PH: 'https://cc.realtimevideo.cc/live/COCKFIGHPHH.m3u8',
+        // };
+        // document.querySelector('.tag[data-url=""]:nth-child(2)').dataset.url = CHANNEL_URLS.SBB;
+        // document.querySelector('.tag[data-url=""]:nth-child(3)').dataset.url = CHANNEL_URLS.PH;
     </script>
 
 </body>
