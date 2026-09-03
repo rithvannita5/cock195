@@ -3,12 +3,9 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>HH888 Live (WebSocket)</title>
+    <title>HH888 Live</title>
     
-    <!-- Socket.IO Client -->
     <script src="https://cdn.socket.io/4.6.1/socket.io.min.js"></script>
-    
-    <!-- Video.js -->
     <link href="https://vjs.zencdn.net/7.20.3/video-js.css" rel="stylesheet" />
     <script src="https://vjs.zencdn.net/7.20.3/video.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/videojs-contrib-hls@5.15.0/dist/videojs-contrib-hls.min.js"></script>
@@ -63,7 +60,6 @@
 <body>
 
     <div class="container">
-        <!-- HEADER -->
         <header class="header">
             <div class="logo">
                 <img src="https://player.cpro.uk/assets/images_v2/HH888/logo/logo.png" alt="HH888" />
@@ -75,10 +71,8 @@
             </div>
         </header>
 
-        <!-- CHANNELS -->
         <div class="channel-grid" id="channelGrid"></div>
 
-        <!-- PLAYER -->
         <div class="player-wrapper">
             <video id="myPlayer" class="video-js vjs-default-skin vjs-big-play-centered" controls preload="auto" autoplay muted playsinline>
                 <p class="vjs-no-js">សូមបើក JavaScript</p>
@@ -90,20 +84,21 @@
         </div>
 
         <div class="footer">
-            <i class="fas fa-shield-alt"></i> Stream from HH888 &bull; Using WebSocket
+            <i class="fas fa-shield-alt"></i> Stream from HH888
         </div>
     </div>
 
     <script>
         // ================================================================
+        //  🔑 TOKEN របស់អូន
+        // ================================================================
+        const TOKEN = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NTU0NTIzMCwidXNlcm5hbWUiOiJBQlBQR0JHRzI2MiIsImlhdCI6MTc4ODQwNzA2NywiZXhwIjoxNzg4NDEwNjY3fQ.hltQwA8kplWK93Vv-41SuWYF8J055VZNd1U1oIO2wlw';
+
+        // ================================================================
         //  CONFIGURATION
         // ================================================================
         const API_URL = 'https://api.zh888.vip';
-        const TOKEN = ''; // ត្រូវការ Token ពីគេហទំព័រដើម
 
-        // ================================================================
-        //  CHANNELS
-        // ================================================================
         const channels = [
             { id: 8, name: 'SBB', icon: '🐓' },
             { id: 47, name: 'V168', icon: '🎰' },
@@ -117,40 +112,10 @@
             { id: 27, name: 'SGMC', icon: '🐓' }
         ];
 
-        // ================================================================
-        //  VARIABLES
-        // ================================================================
         let currentChannel = channels[0];
         let socket = null;
         let player = null;
-
-        // ================================================================
-        //  INITIALIZE PLAYER
-        // ================================================================
-        function initPlayer() {
-            player = videojs('myPlayer', {
-                html5: {
-                    hls: {
-                        enableLowInitialPlaylist: true,
-                        smoothQualityChange: true,
-                        overrideNative: true,
-                        handleManifestRedirects: true
-                    }
-                },
-                controlBar: {
-                    volumePanel: { inline: false },
-                    pictureInPictureToggle: true
-                }
-            });
-
-            player.on('loadeddata', () => {
-                updateStatus('🟢 LIVE', 'live');
-            });
-
-            player.on('error', () => {
-                updateStatus('❌ ERROR', 'offline');
-            });
-        }
+        let liveUrl = '';
 
         // ================================================================
         //  UPDATE STATUS
@@ -184,6 +149,69 @@
         }
 
         // ================================================================
+        //  INIT PLAYER
+        // ================================================================
+        function initPlayer() {
+            player = videojs('myPlayer', {
+                html5: {
+                    hls: {
+                        enableLowInitialPlaylist: true,
+                        smoothQualityChange: true,
+                        overrideNative: true,
+                        handleManifestRedirects: true
+                    }
+                },
+                controlBar: {
+                    volumePanel: { inline: false },
+                    pictureInPictureToggle: true
+                }
+            });
+
+            player.on('loadeddata', () => {
+                updateStatus('🟢 LIVE', 'live');
+            });
+
+            player.on('error', (err) => {
+                console.error('Player error:', err);
+                updateStatus('❌ ERROR', 'offline');
+            });
+        }
+
+        // ================================================================
+        //  LOAD VIDEO
+        // ================================================================
+        function loadVideo(url) {
+            if (!player || !url) return;
+
+            console.log('📺 Loading video:', url);
+            liveUrl = url;
+
+            // ===== បន្ថែម Token ទៅ URL =====
+            const separator = url.includes('?') ? '&' : '?';
+            const finalUrl = `${url}${separator}token=${TOKEN}`;
+
+            const isHLS = finalUrl.includes('.m3u8') || finalUrl.includes('realtimevideo.cc');
+
+            if (isHLS) {
+                player.src({
+                    src: finalUrl,
+                    type: 'application/x-mpegURL'
+                });
+            } else {
+                player.src({
+                    src: finalUrl,
+                    type: 'video/mp4'
+                });
+            }
+
+            player.autoplay(true);
+            player.play().catch(err => {
+                console.warn('Autoplay blocked:', err);
+                updateStatus('▶️ PRESS PLAY', 'connecting');
+            });
+        }
+
+        // ================================================================
         //  SWITCH CHANNEL
         // ================================================================
         function switchChannel(channel) {
@@ -199,23 +227,19 @@
             document.getElementById('fightNumber').textContent = '--';
             updateStatus('⏳ LOADING...', 'connecting');
 
-            // ===== Emit switch channel event =====
             if (socket && socket.connected) {
-                socket.emit('PLAYER_SWITCH_CHANNEL', {
-                    channelId: channel.id
-                });
+                socket.emit('PLAYER_SWITCH_CHANNEL', { channelId: channel.id });
             }
 
-            // សាកល្បងទាញយក URL វីដេអូពី API
+            // ===== សាកល្បងទាញយក URL ពី API =====
             fetchLiveUrl(channel.id);
         }
 
         // ================================================================
-        //  FETCH LIVE URL FROM API
+        //  FETCH LIVE URL
         // ================================================================
         async function fetchLiveUrl(channelId) {
             try {
-                // ===== ប្រើ API ដើម្បីទាញយក URL =====
                 const response = await fetch(`${API_URL}/api/channel/live-url?channelId=${channelId}`, {
                     headers: {
                         'Authorization': `Bearer ${TOKEN}`,
@@ -227,50 +251,21 @@
                     const data = await response.json();
                     if (data && data.url) {
                         loadVideo(data.url);
+                        return;
                     }
-                } else {
-                    console.warn('API returned error, using fallback URL');
-                    // Fallback ប្រើ URL ផ្ទាល់
-                    loadVideo(`https://cc.realtimevideo.cc/live/${currentChannel.name}?origin=HH888`);
                 }
+                // Fallback
+                loadVideo(`https://cc.realtimevideo.cc/live/${currentChannel.name}?origin=HH888`);
             } catch (error) {
-                console.warn('API fetch failed, using fallback:', error);
+                console.warn('API failed, using fallback:', error);
                 loadVideo(`https://cc.realtimevideo.cc/live/${currentChannel.name}?origin=HH888`);
             }
         }
 
         // ================================================================
-        //  LOAD VIDEO
-        // ================================================================
-        function loadVideo(url) {
-            if (!player) return;
-
-            const isHLS = url.includes('.m3u8') || url.includes('realtimevideo.cc');
-
-            if (isHLS) {
-                player.src({
-                    src: url,
-                    type: 'application/x-mpegURL'
-                });
-            } else {
-                player.src({
-                    src: url,
-                    type: 'video/mp4'
-                });
-            }
-
-            player.autoplay(true);
-            player.play().catch(err => {
-                console.warn('Autoplay blocked:', err);
-                updateStatus('▶️ PRESS PLAY', 'connecting');
-            });
-        }
-
-        // ================================================================
-        //  INITIALIZE WEBSOCKET (SOCKET.IO)
+        //  INIT WEBSOCKET
         // ================================================================
         function initSocket() {
-            // ===== ភ្ជាប់ទៅកាន់ WebSocket Server =====
             socket = io(API_URL, {
                 transports: ['websocket', 'polling'],
                 reconnection: true,
@@ -282,25 +277,21 @@
                 }
             });
 
-            // ===== CONNECT =====
             socket.on('connect', () => {
                 console.log('✅ WebSocket connected!');
-                updateStatus('🟢 LIVE', 'live');
+                updateStatus('🟢 CONNECTED', 'live');
                 
-                // ផ្ញើព័ត៌មានចូលប្រើ
                 socket.emit('INITIALIZE', {
                     channelId: currentChannel.id,
                     token: TOKEN
                 });
             });
 
-            // ===== DISCONNECT =====
             socket.on('disconnect', () => {
                 console.warn('⚠️ WebSocket disconnected');
                 updateStatus('⏳ RECONNECTING...', 'connecting');
             });
 
-            // ===== RECEIVE LIVE URL =====
             socket.on('LIVE_URL', (data) => {
                 console.log('📺 Received LIVE_URL:', data);
                 if (data && data.channelId === currentChannel.id && data.data) {
@@ -308,17 +299,13 @@
                 }
             });
 
-            // ===== RECEIVE NEW GAME =====
             socket.on('NEW_GAME', (data) => {
-                console.log('🎮 New game:', data);
                 if (data && data.channelId === currentChannel.id) {
                     document.getElementById('fightNumber').textContent = data.fightNo || '--';
                 }
             });
 
-            // ===== RECEIVE GAME STATUS =====
             socket.on('GAME_STATUS', (data) => {
-                console.log('📊 Game status:', data);
                 if (data && data.channelId === currentChannel.id) {
                     if (data.gameStatus === 'OPEN') {
                         updateStatus('🟢 LIVE', 'live');
@@ -330,17 +317,6 @@
                 }
             });
 
-            // ===== RECEIVE PAYOUT =====
-            socket.on('PAYOUT', (data) => {
-                console.log('💰 Payout:', data);
-            });
-
-            // ===== RECEIVE CHANNEL STATUS =====
-            socket.on('CHANNEL_STATUS', (data) => {
-                console.log('📡 Channel status:', data);
-            });
-
-            // ===== RECEIVE INITIALIZE =====
             socket.on('INITIALIZE', (data) => {
                 console.log('🚀 Initialize:', data);
                 if (data && data.lastGame) {
@@ -348,13 +324,11 @@
                 }
             });
 
-            // ===== ERROR =====
             socket.on('connect_error', (error) => {
                 console.error('❌ WebSocket error:', error);
                 updateStatus('❌ CONNECTION ERROR', 'offline');
             });
 
-            // ===== RECEIVE TOKEN EXPIRED =====
             socket.on('TOKEN_EXPIRED', () => {
                 console.warn('⚠️ Token expired!');
                 updateStatus('🔄 TOKEN EXPIRED', 'offline');
@@ -373,36 +347,24 @@
         });
 
         // ================================================================
-        //  INITIALIZE APP
+        //  INIT
         // ================================================================
         function init() {
             renderChannels();
             initPlayer();
 
-            // ប្រសិនបើមាន Token សូមភ្ជាប់ WebSocket
             if (TOKEN) {
                 initSocket();
                 switchChannel(currentChannel);
             } else {
                 updateStatus('⚠️ NO TOKEN', 'offline');
-                console.warn('⚠️ No token provided. Please get token from zh888.vip');
-                console.log('📖 How to get token:');
-                console.log('1. Open https://zh888.vip in browser');
-                console.log('2. Open Developer Tools (F12) → Application → Cookies');
-                console.log('3. Copy the "p_token" value');
-                console.log('4. Paste it in the TOKEN variable in this code');
-                
-                // Fallback: សាកល្បងប្រើ URL ផ្ទាល់
-                loadVideo(`https://cc.realtimevideo.cc/live/${currentChannel.name}?origin=HH888`);
+                console.log('📖 Please get token from zh888.vip');
             }
 
-            console.log('✅ HH888 Live Web App with WebSocket is ready!');
-            console.log('📺 Press R to refresh channel');
+            console.log('✅ HH888 Live ready!');
+            console.log('📺 Press R to refresh');
         }
 
-        // ================================================================
-        //  START
-        // ================================================================
         document.addEventListener('DOMContentLoaded', init);
     </script>
 
