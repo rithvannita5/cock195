@@ -11,6 +11,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
 
     <style>
+        /* ===== RESET & BASE ===== */
         * {
             margin: 0;
             padding: 0;
@@ -108,6 +109,7 @@
             color: #aaa;
             font-weight: 600;
             font-size: 14px;
+            user-select: none;
         }
 
         .channel-btn:hover {
@@ -174,6 +176,10 @@
             background: #f7971e !important;
         }
 
+        .vjs-error .vjs-error-display {
+            background: rgba(0,0,0,0.8) !important;
+        }
+
         /* ===== INFO BAR ===== */
         .info-bar {
             display: flex;
@@ -231,6 +237,18 @@
                 text-align: center;
             }
         }
+
+        /* ===== FOOTER ===== */
+        .footer {
+            text-align: center;
+            margin-top: 20px;
+            color: #555;
+            font-size: 13px;
+        }
+
+        .footer i {
+            margin-right: 6px;
+        }
     </style>
 </head>
 <body>
@@ -275,9 +293,10 @@
             </div>
         </div>
 
-        <p style="text-align:center;margin-top:20px;color:#555;font-size:13px;">
-            <i class="fas fa-shield-alt"></i> Stream from HH888 &bull; Only works on HLS-supported browsers
-        </p>
+        <!-- ===== FOOTER ===== -->
+        <div class="footer">
+            <i class="fas fa-shield-alt"></i> Stream from HH888 &bull; Requires HLS-supported browser
+        </div>
     </div>
 
     <!-- ===== LIBRARIES ===== -->
@@ -287,7 +306,7 @@
 
     <script>
         // ============================================================
-        //  DANH SÁCH CHANNEL LẤY TỪ FILE HTML GỐC CỦA HH888
+        //  DANH SÁCH CHANNEL (Lấy từ file HTML gốc của HH888)
         // ============================================================
         const channels = [{
             id: 8,
@@ -350,6 +369,7 @@
                     enableLowInitialPlaylist: true,
                     smoothQualityChange: true,
                     overrideNative: true,
+                    handleManifestRedirects: true
                 }
             },
             controlBar: {
@@ -359,6 +379,8 @@
         });
 
         let currentChannel = channels[0];
+        let reconnectAttempts = 0;
+        const MAX_RECONNECT_ATTEMPTS = 5;
 
         // ============================================================
         //  RENDER DANH SÁCH CHANNEL
@@ -388,14 +410,20 @@
             if (!channel || !channel.url) return;
 
             currentChannel = channel;
+            reconnectAttempts = 0;
 
+            // Cập nhật UI
             document.querySelectorAll('.channel-btn').forEach(el => {
                 el.classList.toggle('active', parseInt(el.dataset.id) === channel.id);
             });
             document.getElementById('currentChannelName').textContent = channel.name;
             document.getElementById('fightNumber').textContent = '--';
+            document.getElementById('liveStatus').textContent = 'LOADING...';
 
-            const isHLS = channel.url.includes('.m3u8') || channel.url.includes('realtimevideo.cc');
+            // Kiểm tra loại URL
+            const isHLS = channel.url.includes('.m3u8') || 
+                         channel.url.includes('realtimevideo.cc') ||
+                         channel.url.includes('.m3u');
 
             if (isHLS) {
                 player.src({
@@ -409,13 +437,85 @@
                 });
             }
 
+            // Tự động phát
             player.autoplay(true);
             player.play().catch(err => {
                 console.warn('Autoplay bị chặn:', err);
+                document.getElementById('liveStatus').textContent = 'PRESS PLAY';
             });
 
-            document.getElementById('liveStatus').textContent = 'LIVE';
+            // Cập nhật fight number sau khi tải
+            setTimeout(() => {
+                if (document.getElementById('fightNumber').textContent === '--') {
+                    document.getElementById('fightNumber').textContent = String(Math.floor(Math.random() * 90) + 10);
+                }
+            }, 2000);
         }
+
+        // ============================================================
+        //  XỬ LÝ LỖI & TỰ ĐỘNG KẾT NỐI LẠI
+        // ============================================================
+        player.on('error', function() {
+            const error = player.error();
+            console.error('Lỗi phát video:', error);
+
+            // Hiển thị thông báo lỗi thân thiện
+            let errorMsg = 'Lỗi kết nối';
+            if (error && error.code === 4) {
+                errorMsg = 'Không tìm thấy video stream';
+            } else if (error && error.code === 2) {
+                errorMsg = 'Lỗi mạng hoặc server';
+            }
+            document.getElementById('liveStatus').textContent = '⚠️ ' + errorMsg;
+
+            // Tự động thử kết nối lại
+            if (reconnectAttempts < MAX_RECONNECT_ATTEMPTS) {
+                reconnectAttempts++;
+                const delay = 3000 * reconnectAttempts;
+                document.getElementById('liveStatus').textContent = `🔄 Thử lại (${reconnectAttempts}/${MAX_RECONNECT_ATTEMPTS})...`;
+                
+                setTimeout(() => {
+                    console.log(`Thử kết nối lại lần ${reconnectAttempts}...`);
+                    switchChannel(currentChannel);
+                }, delay);
+            } else {
+                document.getElementById('liveStatus').textContent = '❌ Không thể kết nối';
+            }
+        });
+
+        // Xử lý khi player sẵn sàng
+        player.on('loadeddata', function() {
+            document.getElementById('liveStatus').textContent = 'LIVE';
+            reconnectAttempts = 0;
+        });
+
+        // Xử lý khi kết nối bị mất
+        player.on('waiting', function() {
+            document.getElementById('liveStatus').textContent = '⏳ Đang tải...';
+        });
+
+        // Xử lý khi kết nối lại thành công
+        player.on('canplay', function() {
+            document.getElementById('liveStatus').textContent = 'LIVE';
+        });
+
+        // ============================================================
+        //  FIGHT NUMBER - CẬP NHẬT TỰ ĐỘNG (GIẢ LẬP)
+        // ============================================================
+        setInterval(() => {
+            const fightNo = document.getElementById('fightNumber');
+            const currentText = fightNo.textContent;
+            if (currentText === '--') {
+                fightNo.textContent = String(Math.floor(Math.random() * 90) + 10);
+            } else {
+                const num = parseInt(currentText);
+                if (!isNaN(num) && num < 200) {
+                    fightNo.textContent = String(num + 1);
+                } else {
+                    fightNo.textContent = String(Math.floor(Math.random() * 90) + 10);
+                }
+            }
+        }, 8000);
 
         // ============================================================
         //  KHỞI TẠO APP
@@ -423,29 +523,9 @@
         renderChannels();
 
         player.ready(() => {
+            console.log('✅ Player đã sẵn sàng!');
             switchChannel(currentChannel);
         });
-
-        // ============================================================
-        //  XỬ LÝ LỖI & TỰ ĐỘNG LOAD LẠI
-        // ============================================================
-        player.on('error', function() {
-            console.error('Lỗi phát video, thử tải lại sau 3s...');
-            document.getElementById('liveStatus').textContent = 'RECONNECTING...';
-            setTimeout(() => {
-                switchChannel(currentChannel);
-            }, 3000);
-        });
-
-        // Hiển thị số hiệu fight (giả lập)
-        setInterval(() => {
-            const fightNo = document.getElementById('fightNumber');
-            if (fightNo.textContent === '--') {
-                fightNo.textContent = String(Math.floor(Math.random() * 90) + 10);
-            } else {
-                fightNo.textContent = String(parseInt(fightNo.textContent) + 1);
-            }
-        }, 8000);
 
         console.log('✅ HH888 Live Web App is ready!');
     </script>
