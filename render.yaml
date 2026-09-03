@@ -1,6 +1,6 @@
 services:
   - type: web
     name: hh888-live
-    env: node
-    buildCommand: "npm install"
-    startCommand: "npm start"
+    env: static
+    staticPublishPath: .
+    buildCommand: ""
