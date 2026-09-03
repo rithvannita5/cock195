@@ -14,7 +14,7 @@
 
         body {
             background: #0a0a0a;
-            font-family: 'Segoe UI', Arial, sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             min-height: 100vh;
         }
 
@@ -26,11 +26,11 @@
             align-items: center;
             justify-content: space-between;
             border-bottom: 2px solid #222;
-            flex-wrap: wrap;
-            gap: 10px;
             position: sticky;
             top: 0;
             z-index: 100;
+            flex-wrap: wrap;
+            gap: 10px;
         }
 
         .logo {
@@ -80,10 +80,47 @@
             font-weight: 600;
         }
 
+        /* ===== NOTICE BAR ===== */
+        .notice {
+            background: #1a1a2e;
+            color: #f7971e;
+            text-align: center;
+            padding: 10px 16px;
+            font-size: 14px;
+            border-bottom: 1px solid #222;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .notice .login-btn {
+            background: #f7971e;
+            color: #0a0a0a;
+            border: none;
+            padding: 6px 18px;
+            border-radius: 6px;
+            font-weight: 700;
+            font-size: 13px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .notice .login-btn:hover {
+            background: #ffd200;
+            transform: scale(1.05);
+        }
+
+        .notice .status-text {
+            font-size: 13px;
+            color: #888;
+        }
+
         /* ===== IFRAME ===== */
         .iframe-container {
             width: 100%;
-            height: calc(100vh - 80px);
+            height: calc(100vh - 120px);
             background: #000;
             position: relative;
         }
@@ -151,8 +188,14 @@
                 width: 8px;
                 height: 8px;
             }
+            .notice {
+                font-size: 12px;
+                padding: 8px 12px;
+                flex-direction: column;
+                gap: 6px;
+            }
             .iframe-container {
-                height: calc(100vh - 70px);
+                height: calc(100vh - 110px);
             }
         }
     </style>
@@ -167,21 +210,27 @@
         </div>
         <div class="status">
             <span class="dot"></span>
-            <span class="live-text">LIVE</span>
+            <span class="live-text" id="liveStatus">LIVE</span>
             <span id="timeDisplay" style="color:#555;font-size:12px;"></span>
         </div>
     </header>
+
+    <!-- ===== NOTICE ===== -->
+    <div class="notice" id="noticeBar">
+        <span>🔑 សូមចុចប៊ូតុងខាងក្រោមដើម្បី Login</span>
+        <button class="login-btn" onclick="login()">🔐 ចូលប្រើ</button>
+        <span class="status-text" id="loginStatus">(មិនទាន់បានចូលប្រើ)</span>
+    </div>
 
     <!-- ===== IFRAME ===== -->
     <div class="iframe-container">
         <div class="loading-overlay" id="loadingOverlay">
             <div class="spinner"></div>
-            <p>⏳ កំពុងផ្ទុកវីដេអូ...</p>
-            <p style="font-size:12px;color:#555;margin-top:8px;">ប្រសិនបើវីដេអូមិនចាក់ សូមចុច Refresh</p>
+            <p>⏳ កំពុងផ្ទុក...</p>
         </div>
         <iframe
             id="mainIframe"
-            src="https://zh888.vip"
+            src="about:blank"
             allow="autoplay; encrypted-media; fullscreen"
             allowfullscreen
             loading="lazy"
@@ -195,26 +244,52 @@
         // ================================================================
         const iframe = document.getElementById('mainIframe');
         const loadingOverlay = document.getElementById('loadingOverlay');
+        const loginStatus = document.getElementById('loginStatus');
+        const liveStatus = document.getElementById('liveStatus');
         const timeDisplay = document.getElementById('timeDisplay');
 
+        let isLoggedIn = false;
+
         // ================================================================
-        //  បង្ហាញម៉ោងបច្ចុប្បន្ន
+        //  TIME
         // ================================================================
         function updateTime() {
             const now = new Date();
-            const timeStr = now.toLocaleTimeString('km-KH', {
+            timeDisplay.textContent = '🕐 ' + now.toLocaleTimeString('km-KH', {
                 hour: '2-digit',
                 minute: '2-digit',
                 second: '2-digit',
                 hour12: false
             });
-            timeDisplay.textContent = '🕐 ' + timeStr;
         }
         updateTime();
         setInterval(updateTime, 1000);
 
         // ================================================================
-        //  លាក់ Loading Overlay ពេល iframe ផ្ទុករួច
+        //  LOGIN FUNCTION
+        // ================================================================
+        function login() {
+            // ===== បើកទំព័រចូលប្រើ =====
+            iframe.src = 'https://zh888.vip/login';
+            loadingOverlay.classList.remove('hidden');
+            loginStatus.textContent = '⏳ កំពុងភ្ជាប់...';
+            liveStatus.textContent = 'CONNECTING...';
+
+            // ===== បន្ទាប់ពី 5 វិនាទី ប្តូរទៅទំព័រដើម =====
+            setTimeout(() => {
+                iframe.src = 'https://zh888.vip';
+                loginStatus.textContent = '✅ បានភ្ជាប់រួចរាល់!';
+                liveStatus.textContent = 'LIVE';
+                document.querySelector('.notice .login-btn').textContent = '🔄 ផ្ទុកឡើងវិញ';
+                document.querySelector('.notice .login-btn').onclick = function() {
+                    location.reload();
+                };
+                isLoggedIn = true;
+            }, 5000);
+        }
+
+        // ================================================================
+        //  HIDE LOADING OVERLAY
         // ================================================================
         iframe.addEventListener('load', function() {
             setTimeout(function() {
@@ -223,10 +298,9 @@
         });
 
         // ================================================================
-        //  ប្រសិនបើ iframe ផ្ទុកយូរ (15 វិនាទី)
+        //  TIMEOUT
         // ================================================================
         setTimeout(function() {
-            // ប្រសិនបើ overlay នៅតែបង្ហាញ មានន័យថា iframe ផ្ទុកយូរ
             if (!loadingOverlay.classList.contains('hidden')) {
                 loadingOverlay.innerHTML = `
                     <div style="font-size:48px;margin-bottom:20px;">⚠️</div>
@@ -235,12 +309,12 @@
                     <button onclick="location.reload()" style="
                         margin-top:20px;
                         background: #f7971e;
-                        color: #fff;
+                        color: #0a0a0a;
                         border: none;
                         padding: 10px 30px;
                         border-radius: 8px;
                         font-size: 16px;
-                        font-weight: 600;
+                        font-weight: 700;
                         cursor: pointer;
                     ">🔄 ផ្ទុកឡើងវិញ</button>
                 `;
@@ -251,13 +325,11 @@
         //  KEYBOARD SHORTCUTS
         // ================================================================
         document.addEventListener('keydown', function(e) {
-            // Press 'R' or 'r' to refresh
             if (e.key === 'r' || e.key === 'R') {
                 if (e.ctrlKey || e.metaKey) return;
                 e.preventDefault();
                 location.reload();
             }
-            // Press 'F' for fullscreen
             if (e.key === 'f' || e.key === 'F') {
                 if (e.ctrlKey || e.metaKey) return;
                 e.preventDefault();
@@ -267,13 +339,24 @@
                     document.documentElement.requestFullscreen();
                 }
             }
+            if (e.key === 'l' || e.key === 'L') {
+                if (e.ctrlKey || e.metaKey) return;
+                e.preventDefault();
+                if (!isLoggedIn) login();
+            }
         });
 
         // ================================================================
         //  CONSOLE
         // ================================================================
         console.log('✅ HH888 Live (iframe) is ready!');
-        console.log('📌 Press R to refresh | F for fullscreen');
+        console.log('📌 Press L to login | R to refresh | F for fullscreen');
+
+        // ================================================================
+        //  AUTO LOGIN? (ប្រសិនបើអូនចង់ឲ្យ Login ដោយស្វ័យប្រវត្តិ)
+        // ================================================================
+        // ប្រសិនបើអូនចង់ឲ្យ Login ដោយស្វ័យប្រវត្តិ សូមដក Comment បន្ទាត់ខាងក្រោមចេញ
+        // setTimeout(login, 2000);
     </script>
 
 </body>
