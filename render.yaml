@@ -1,7 +1,6 @@
-# render.yaml - Configuration for Render.com Static Site
 services:
   - type: web
-    name: hh888-live-stream
+    name: hh888-live
     env: static
     staticPublishPath: .
     buildCommand: ""
@@ -9,6 +8,3 @@ services:
       - path: /*
         name: X-Frame-Options
         value: sameorigin
-      - path: /*
-        name: Content-Security-Policy
-        value: "default-src 'self'; script-src 'self' 'unsafe-inline' https://vjs.zencdn.net https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://vjs.zencdn.net https://cdnjs.cloudflare.com; img-src 'self' data: https://player.cpro.uk; connect-src 'self' https://cc.realtimevideo.cc https://corsproxy.io; media-src 'self' https://cc.realtimevideo.cc https://corsproxy.io; font-src 'self' https://cdnjs.cloudflare.com;"
