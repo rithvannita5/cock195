@@ -4,7 +4,3 @@ services:
     env: static
     staticPublishPath: .
     buildCommand: ""
-    headers:
-      - path: /*
-        name: X-Frame-Options
-        value: sameorigin
