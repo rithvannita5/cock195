@@ -4,368 +4,276 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>HH888 Live</title>
-    
-    <script src="https://cdn.socket.io/4.6.1/socket.io.min.js"></script>
-    <link href="https://vjs.zencdn.net/7.20.3/video-js.css" rel="stylesheet" />
-    <script src="https://vjs.zencdn.net/7.20.3/video.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/videojs-contrib-hls@5.15.0/dist/videojs-contrib-hls.min.js"></script>
-
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { background: #0a0a0a; color: #fff; font-family: 'Segoe UI', Arial, sans-serif; }
-        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
-        
-        .header { display: flex; align-items: center; justify-content: space-between; padding: 15px 0; border-bottom: 2px solid #222; margin-bottom: 25px; flex-wrap: wrap; gap: 15px; }
-        .logo { display: flex; align-items: center; gap: 12px; }
-        .logo img { width: 50px; height: 50px; border-radius: 12px; background: #1a1a2e; padding: 5px; }
-        .logo h1 { font-size: 26px; font-weight: 700; background: linear-gradient(135deg, #f7971e, #ffd200); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        
-        .status-badge { padding: 6px 18px; border-radius: 30px; font-size: 14px; font-weight: 600; color: #fff; display: flex; align-items: center; gap: 8px; transition: 0.5s; }
-        .status-badge.live { background: #2ecc71; }
-        .status-badge.connecting { background: #f39c12; }
-        .status-badge.offline { background: #e74c3c; }
-        .status-badge .dot { width: 10px; height: 10px; border-radius: 50%; background: #fff; animation: blink 1.2s infinite; }
-        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.2; } }
-        
-        .channel-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 12px; margin-bottom: 25px; }
-        .channel-btn { background: #1a1a2e; border: 2px solid transparent; border-radius: 14px; padding: 14px 8px; text-align: center; cursor: pointer; transition: 0.3s; color: #aaa; font-weight: 600; font-size: 14px; }
-        .channel-btn:hover { background: #252540; border-color: #f7971e; color: #fff; transform: translateY(-3px); }
-        .channel-btn.active { border-color: #f7971e; background: #252540; color: #ffd200; box-shadow: 0 0 25px rgba(247, 151, 30, 0.25); }
-        .channel-btn .icon { font-size: 28px; display: block; margin-bottom: 6px; }
-        .channel-btn .badge-live { background: #e74c3c; color: #fff; font-size: 10px; padding: 2px 10px; border-radius: 20px; display: inline-block; margin-top: 4px; }
-        
-        .player-wrapper { background: #111; border-radius: 20px; overflow: hidden; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8); }
-        .player-wrapper video { width: 100% !important; height: auto !important; aspect-ratio: 16/9; background: #000; display: block; }
-        
-        .video-js .vjs-big-play-button { background: rgba(247, 151, 30, 0.85) !important; border-radius: 50% !important; width: 70px !important; height: 70px !important; line-height: 70px !important; font-size: 28px !important; border: none !important; top: 50% !important; left: 50% !important; transform: translate(-50%, -50%) !important; }
-        .video-js .vjs-big-play-button:hover { background: #f7971e !important; }
-        
-        .info-bar { display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; background: #0d0d1a; border-top: 1px solid #222; flex-wrap: wrap; gap: 10px; }
-        .info-bar .channel-name { font-size: 18px; font-weight: 700; color: #ffd200; }
-        .info-bar .fight-no { background: #2c2c4a; padding: 4px 16px; border-radius: 30px; font-size: 14px; color: #aaa; }
-        .info-bar .fight-no span { color: #fff; font-weight: 700; }
-        
-        .footer { text-align: center; margin-top: 20px; color: #555; font-size: 13px; }
-        
+        /* ===== RESET ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #0a0a0a;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            min-height: 100vh;
+        }
+
+        /* ===== HEADER ===== */
+        .header {
+            background: #111;
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 2px solid #222;
+            flex-wrap: wrap;
+            gap: 10px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo img {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+        }
+
+        .logo h1 {
+            font-size: 22px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #f7971e, #ffd200);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .status {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 13px;
+            color: #aaa;
+        }
+
+        .status .dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #2ecc71;
+            animation: blink 1.2s infinite;
+            display: inline-block;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.2; }
+        }
+
+        .status .live-text {
+            color: #2ecc71;
+            font-weight: 600;
+        }
+
+        /* ===== IFRAME ===== */
+        .iframe-container {
+            width: 100%;
+            height: calc(100vh - 80px);
+            background: #000;
+            position: relative;
+        }
+
+        .iframe-container iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            background: #000;
+        }
+
+        /* ===== LOADING OVERLAY ===== */
+        .loading-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #0a0a0a;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            z-index: 10;
+            transition: opacity 0.5s ease;
+        }
+
+        .loading-overlay.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .loading-overlay .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid #222;
+            border-top-color: #f7971e;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin-bottom: 20px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .loading-overlay p {
+            font-size: 14px;
+            color: #888;
+        }
+
+        /* ===== RESPONSIVE ===== */
         @media (max-width: 640px) {
-            .header { flex-direction: column; align-items: stretch; text-align: center; }
-            .logo { justify-content: center; }
-            .channel-grid { grid-template-columns: repeat(auto-fill, minmax(90px, 1fr)); gap: 8px; }
-            .channel-btn { font-size: 12px; padding: 10px 4px; }
-            .channel-btn .icon { font-size: 22px; }
-            .info-bar { flex-direction: column; text-align: center; }
+            .header {
+                padding: 8px 12px;
+            }
+            .logo h1 {
+                font-size: 18px;
+            }
+            .status {
+                font-size: 11px;
+            }
+            .status .dot {
+                width: 8px;
+                height: 8px;
+            }
+            .iframe-container {
+                height: calc(100vh - 70px);
+            }
         }
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <header class="header">
-            <div class="logo">
-                <img src="https://player.cpro.uk/assets/images_v2/HH888/logo/logo.png" alt="HH888" />
-                <h1>HH888</h1>
-            </div>
-            <div class="status-badge connecting" id="statusBadge">
-                <span class="dot"></span>
-                <span id="liveStatus">CONNECTING...</span>
-            </div>
-        </header>
-
-        <div class="channel-grid" id="channelGrid"></div>
-
-        <div class="player-wrapper">
-            <video id="myPlayer" class="video-js vjs-default-skin vjs-big-play-centered" controls preload="auto" autoplay muted playsinline>
-                <p class="vjs-no-js">សូមបើក JavaScript</p>
-            </video>
-            <div class="info-bar">
-                <span class="channel-name" id="currentChannelName">SBB</span>
-                <span class="fight-no">លេខគូ: <span id="fightNumber">--</span></span>
-            </div>
+    <!-- ===== HEADER ===== -->
+    <header class="header">
+        <div class="logo">
+            <img src="https://player.cpro.uk/assets/images_v2/HH888/logo/logo.png" alt="HH888" />
+            <h1>HH888</h1>
         </div>
-
-        <div class="footer">
-            <i class="fas fa-shield-alt"></i> Stream from HH888
+        <div class="status">
+            <span class="dot"></span>
+            <span class="live-text">LIVE</span>
+            <span id="timeDisplay" style="color:#555;font-size:12px;"></span>
         </div>
+    </header>
+
+    <!-- ===== IFRAME ===== -->
+    <div class="iframe-container">
+        <div class="loading-overlay" id="loadingOverlay">
+            <div class="spinner"></div>
+            <p>⏳ កំពុងផ្ទុកវីដេអូ...</p>
+            <p style="font-size:12px;color:#555;margin-top:8px;">ប្រសិនបើវីដេអូមិនចាក់ សូមចុច Refresh</p>
+        </div>
+        <iframe
+            id="mainIframe"
+            src="https://zh888.vip"
+            allow="autoplay; encrypted-media; fullscreen"
+            allowfullscreen
+            loading="lazy"
+            referrerpolicy="no-referrer-when-downgrade"
+        ></iframe>
     </div>
 
     <script>
         // ================================================================
-        //  🔑 TOKEN របស់អូន
+        //  VARIABLES
         // ================================================================
-        const TOKEN = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NTU0NTIzMCwidXNlcm5hbWUiOiJBQlBQR0JHRzI2MiIsImlhdCI6MTc4ODQwNzA2NywiZXhwIjoxNzg4NDEwNjY3fQ.hltQwA8kplWK93Vv-41SuWYF8J055VZNd1U1oIO2wlw';
+        const iframe = document.getElementById('mainIframe');
+        const loadingOverlay = document.getElementById('loadingOverlay');
+        const timeDisplay = document.getElementById('timeDisplay');
 
         // ================================================================
-        //  CONFIGURATION
+        //  បង្ហាញម៉ោងបច្ចុប្បន្ន
         // ================================================================
-        const API_URL = 'https://api.zh888.vip';
-
-        const channels = [
-            { id: 8, name: 'SBB', icon: '🐓' },
-            { id: 47, name: 'V168', icon: '🎰' },
-            { id: 1, name: 'PH', icon: '🐔' },
-            { id: 2, name: 'BAC', icon: '🃏' },
-            { id: 23, name: 'TD', icon: '🐉' },
-            { id: 37, name: 'W8_BAC1', icon: '🃏' },
-            { id: 30, name: 'W8_BAC2', icon: '🃏' },
-            { id: 40, name: 'W8_TD1', icon: '🐉' },
-            { id: 46, name: 'W8_TD2', icon: '🐉' },
-            { id: 27, name: 'SGMC', icon: '🐓' }
-        ];
-
-        let currentChannel = channels[0];
-        let socket = null;
-        let player = null;
-        let liveUrl = '';
-
-        // ================================================================
-        //  UPDATE STATUS
-        // ================================================================
-        function updateStatus(text, type = 'connecting') {
-            const badge = document.getElementById('statusBadge');
-            const label = document.getElementById('liveStatus');
-            badge.className = 'status-badge ' + type;
-            label.textContent = text;
+        function updateTime() {
+            const now = new Date();
+            const timeStr = now.toLocaleTimeString('km-KH', {
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                hour12: false
+            });
+            timeDisplay.textContent = '🕐 ' + timeStr;
         }
+        updateTime();
+        setInterval(updateTime, 1000);
 
         // ================================================================
-        //  RENDER CHANNELS
+        //  លាក់ Loading Overlay ពេល iframe ផ្ទុករួច
         // ================================================================
-        function renderChannels() {
-            const grid = document.getElementById('channelGrid');
-            grid.innerHTML = '';
+        iframe.addEventListener('load', function() {
+            setTimeout(function() {
+                loadingOverlay.classList.add('hidden');
+            }, 500);
+        });
 
-            channels.forEach(ch => {
-                const btn = document.createElement('div');
-                btn.className = 'channel-btn' + (ch.id === currentChannel.id ? ' active' : '');
-                btn.dataset.id = ch.id;
-                btn.innerHTML = `
-                    <span class="icon">${ch.icon}</span>
-                    ${ch.name}
-                    <span class="badge-live">LIVE</span>
+        // ================================================================
+        //  ប្រសិនបើ iframe ផ្ទុកយូរ (15 វិនាទី)
+        // ================================================================
+        setTimeout(function() {
+            // ប្រសិនបើ overlay នៅតែបង្ហាញ មានន័យថា iframe ផ្ទុកយូរ
+            if (!loadingOverlay.classList.contains('hidden')) {
+                loadingOverlay.innerHTML = `
+                    <div style="font-size:48px;margin-bottom:20px;">⚠️</div>
+                    <p style="font-size:16px;color:#f39c12;">ការផ្ទុកកំពុងចំណាយពេលយូរ</p>
+                    <p style="font-size:13px;color:#888;margin-top:10px;">សូមពិនិត្យការតភ្ជាប់អ៊ីនធឺណិត</p>
+                    <button onclick="location.reload()" style="
+                        margin-top:20px;
+                        background: #f7971e;
+                        color: #fff;
+                        border: none;
+                        padding: 10px 30px;
+                        border-radius: 8px;
+                        font-size: 16px;
+                        font-weight: 600;
+                        cursor: pointer;
+                    ">🔄 ផ្ទុកឡើងវិញ</button>
                 `;
-                btn.addEventListener('click', () => switchChannel(ch));
-                grid.appendChild(btn);
-            });
-        }
-
-        // ================================================================
-        //  INIT PLAYER
-        // ================================================================
-        function initPlayer() {
-            player = videojs('myPlayer', {
-                html5: {
-                    hls: {
-                        enableLowInitialPlaylist: true,
-                        smoothQualityChange: true,
-                        overrideNative: true,
-                        handleManifestRedirects: true
-                    }
-                },
-                controlBar: {
-                    volumePanel: { inline: false },
-                    pictureInPictureToggle: true
-                }
-            });
-
-            player.on('loadeddata', () => {
-                updateStatus('🟢 LIVE', 'live');
-            });
-
-            player.on('error', (err) => {
-                console.error('Player error:', err);
-                updateStatus('❌ ERROR', 'offline');
-            });
-        }
-
-        // ================================================================
-        //  LOAD VIDEO
-        // ================================================================
-        function loadVideo(url) {
-            if (!player || !url) return;
-
-            console.log('📺 Loading video:', url);
-            liveUrl = url;
-
-            // ===== បន្ថែម Token ទៅ URL =====
-            const separator = url.includes('?') ? '&' : '?';
-            const finalUrl = `${url}${separator}token=${TOKEN}`;
-
-            const isHLS = finalUrl.includes('.m3u8') || finalUrl.includes('realtimevideo.cc');
-
-            if (isHLS) {
-                player.src({
-                    src: finalUrl,
-                    type: 'application/x-mpegURL'
-                });
-            } else {
-                player.src({
-                    src: finalUrl,
-                    type: 'video/mp4'
-                });
             }
-
-            player.autoplay(true);
-            player.play().catch(err => {
-                console.warn('Autoplay blocked:', err);
-                updateStatus('▶️ PRESS PLAY', 'connecting');
-            });
-        }
-
-        // ================================================================
-        //  SWITCH CHANNEL
-        // ================================================================
-        function switchChannel(channel) {
-            if (!channel) return;
-
-            currentChannel = channel;
-
-            document.querySelectorAll('.channel-btn').forEach(el => {
-                el.classList.toggle('active', parseInt(el.dataset.id) === channel.id);
-            });
-
-            document.getElementById('currentChannelName').textContent = channel.name;
-            document.getElementById('fightNumber').textContent = '--';
-            updateStatus('⏳ LOADING...', 'connecting');
-
-            if (socket && socket.connected) {
-                socket.emit('PLAYER_SWITCH_CHANNEL', { channelId: channel.id });
-            }
-
-            // ===== សាកល្បងទាញយក URL ពី API =====
-            fetchLiveUrl(channel.id);
-        }
-
-        // ================================================================
-        //  FETCH LIVE URL
-        // ================================================================
-        async function fetchLiveUrl(channelId) {
-            try {
-                const response = await fetch(`${API_URL}/api/channel/live-url?channelId=${channelId}`, {
-                    headers: {
-                        'Authorization': `Bearer ${TOKEN}`,
-                        'Content-Type': 'application/json'
-                    }
-                });
-
-                if (response.ok) {
-                    const data = await response.json();
-                    if (data && data.url) {
-                        loadVideo(data.url);
-                        return;
-                    }
-                }
-                // Fallback
-                loadVideo(`https://cc.realtimevideo.cc/live/${currentChannel.name}?origin=HH888`);
-            } catch (error) {
-                console.warn('API failed, using fallback:', error);
-                loadVideo(`https://cc.realtimevideo.cc/live/${currentChannel.name}?origin=HH888`);
-            }
-        }
-
-        // ================================================================
-        //  INIT WEBSOCKET
-        // ================================================================
-        function initSocket() {
-            socket = io(API_URL, {
-                transports: ['websocket', 'polling'],
-                reconnection: true,
-                reconnectionAttempts: 10,
-                reconnectionDelay: 1000,
-                auth: {
-                    token: TOKEN,
-                    channelId: currentChannel.id
-                }
-            });
-
-            socket.on('connect', () => {
-                console.log('✅ WebSocket connected!');
-                updateStatus('🟢 CONNECTED', 'live');
-                
-                socket.emit('INITIALIZE', {
-                    channelId: currentChannel.id,
-                    token: TOKEN
-                });
-            });
-
-            socket.on('disconnect', () => {
-                console.warn('⚠️ WebSocket disconnected');
-                updateStatus('⏳ RECONNECTING...', 'connecting');
-            });
-
-            socket.on('LIVE_URL', (data) => {
-                console.log('📺 Received LIVE_URL:', data);
-                if (data && data.channelId === currentChannel.id && data.data) {
-                    loadVideo(data.data);
-                }
-            });
-
-            socket.on('NEW_GAME', (data) => {
-                if (data && data.channelId === currentChannel.id) {
-                    document.getElementById('fightNumber').textContent = data.fightNo || '--';
-                }
-            });
-
-            socket.on('GAME_STATUS', (data) => {
-                if (data && data.channelId === currentChannel.id) {
-                    if (data.gameStatus === 'OPEN') {
-                        updateStatus('🟢 LIVE', 'live');
-                    } else if (data.gameStatus === 'CLOSED') {
-                        updateStatus('🔴 CLOSED', 'offline');
-                    } else {
-                        updateStatus('⏳ WAITING', 'connecting');
-                    }
-                }
-            });
-
-            socket.on('INITIALIZE', (data) => {
-                console.log('🚀 Initialize:', data);
-                if (data && data.lastGame) {
-                    document.getElementById('fightNumber').textContent = data.lastGame.fightNo || '--';
-                }
-            });
-
-            socket.on('connect_error', (error) => {
-                console.error('❌ WebSocket error:', error);
-                updateStatus('❌ CONNECTION ERROR', 'offline');
-            });
-
-            socket.on('TOKEN_EXPIRED', () => {
-                console.warn('⚠️ Token expired!');
-                updateStatus('🔄 TOKEN EXPIRED', 'offline');
-            });
-        }
+        }, 15000);
 
         // ================================================================
         //  KEYBOARD SHORTCUTS
         // ================================================================
         document.addEventListener('keydown', function(e) {
+            // Press 'R' or 'r' to refresh
             if (e.key === 'r' || e.key === 'R') {
                 if (e.ctrlKey || e.metaKey) return;
                 e.preventDefault();
-                switchChannel(currentChannel);
+                location.reload();
+            }
+            // Press 'F' for fullscreen
+            if (e.key === 'f' || e.key === 'F') {
+                if (e.ctrlKey || e.metaKey) return;
+                e.preventDefault();
+                if (document.fullscreenElement) {
+                    document.exitFullscreen();
+                } else {
+                    document.documentElement.requestFullscreen();
+                }
             }
         });
 
         // ================================================================
-        //  INIT
+        //  CONSOLE
         // ================================================================
-        function init() {
-            renderChannels();
-            initPlayer();
-
-            if (TOKEN) {
-                initSocket();
-                switchChannel(currentChannel);
-            } else {
-                updateStatus('⚠️ NO TOKEN', 'offline');
-                console.log('📖 Please get token from zh888.vip');
-            }
-
-            console.log('✅ HH888 Live ready!');
-            console.log('📺 Press R to refresh');
-        }
-
-        document.addEventListener('DOMContentLoaded', init);
+        console.log('✅ HH888 Live (iframe) is ready!');
+        console.log('📌 Press R to refresh | F for fullscreen');
     </script>
 
 </body>
