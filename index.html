@@ -10,21 +10,9 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
 
     <style>
-        /* ===== RESET ===== */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            background: #0a0a0a;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            min-height: 100vh;
-            color: #fff;
-        }
-
-        /* ===== HEADER ===== */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background: #0a0a0a; font-family: 'Segoe UI', Arial, sans-serif; color: #fff; min-height: 100vh; }
+        
         .header {
             background: #111;
             padding: 12px 20px;
@@ -38,57 +26,15 @@
             flex-wrap: wrap;
             gap: 10px;
         }
+        .logo { display: flex; align-items: center; gap: 12px; }
+        .logo img { width: 40px; height: 40px; border-radius: 10px; background: #1a1a2e; padding: 4px; }
+        .logo h1 { font-size: 22px; font-weight: 700; background: linear-gradient(135deg, #f7971e, #ffd200); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        
+        .status { display: flex; align-items: center; gap: 10px; font-size: 13px; color: #aaa; }
+        .status .dot { width: 10px; height: 10px; border-radius: 50%; background: #2ecc71; animation: blink 1.2s infinite; display: inline-block; }
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.2; } }
+        .status .live-text { color: #2ecc71; font-weight: 600; }
 
-        .logo {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .logo img {
-            width: 40px;
-            height: 40px;
-            border-radius: 10px;
-            background: #1a1a2e;
-            padding: 4px;
-        }
-
-        .logo h1 {
-            font-size: 22px;
-            font-weight: 700;
-            background: linear-gradient(135deg, #f7971e, #ffd200);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .status {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 13px;
-            color: #aaa;
-        }
-
-        .status .dot {
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            background: #2ecc71;
-            animation: blink 1.2s infinite;
-            display: inline-block;
-        }
-
-        @keyframes blink {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.2; }
-        }
-
-        .status .live-text {
-            color: #2ecc71;
-            font-weight: 600;
-        }
-
-        /* ===== URL INPUT ===== */
         .url-bar {
             background: #1a1a2e;
             padding: 12px 20px;
@@ -98,7 +44,6 @@
             border-bottom: 1px solid #222;
             flex-wrap: wrap;
         }
-
         .url-bar input {
             flex: 1;
             background: #0a0a0a;
@@ -110,15 +55,8 @@
             min-width: 200px;
             outline: none;
         }
-
-        .url-bar input:focus {
-            border-color: #f7971e;
-        }
-
-        .url-bar input::placeholder {
-            color: #555;
-        }
-
+        .url-bar input:focus { border-color: #f7971e; }
+        .url-bar input::placeholder { color: #555; }
         .url-bar .btn {
             background: #f7971e;
             color: #0a0a0a;
@@ -131,22 +69,10 @@
             transition: 0.3s;
             white-space: nowrap;
         }
+        .url-bar .btn:hover { background: #ffd200; transform: scale(1.02); }
+        .url-bar .btn-secondary { background: #333; color: #fff; }
+        .url-bar .btn-secondary:hover { background: #444; }
 
-        .url-bar .btn:hover {
-            background: #ffd200;
-            transform: scale(1.02);
-        }
-
-        .url-bar .btn-secondary {
-            background: #333;
-            color: #fff;
-        }
-
-        .url-bar .btn-secondary:hover {
-            background: #444;
-        }
-
-        /* ===== PLAYER ===== */
         .player-wrapper {
             background: #111;
             margin: 0 auto;
@@ -154,15 +80,8 @@
             border-radius: 0 0 15px 15px;
             overflow: hidden;
         }
-
-        .player-wrapper video {
-            width: 100% !important;
-            height: auto !important;
-            aspect-ratio: 16 / 9;
-            background: #000;
-            display: block;
-        }
-
+        .player-wrapper video { width: 100% !important; height: auto !important; aspect-ratio: 16/9; background: #000; display: block; }
+        
         .video-js .vjs-big-play-button {
             background: rgba(247, 151, 30, 0.85) !important;
             border-radius: 50% !important;
@@ -175,12 +94,8 @@
             left: 50% !important;
             transform: translate(-50%, -50%) !important;
         }
+        .video-js .vjs-big-play-button:hover { background: #f7971e !important; }
 
-        .video-js .vjs-big-play-button:hover {
-            background: #f7971e !important;
-        }
-
-        /* ===== INFO BAR ===== */
         .info-bar {
             display: flex;
             justify-content: space-between;
@@ -193,103 +108,25 @@
             max-width: 1000px;
             margin: 0 auto;
         }
+        .info-bar .channel-name { font-size: 16px; font-weight: 700; color: #ffd200; }
+        .info-bar .fight-no { background: #2c2c4a; padding: 4px 16px; border-radius: 30px; font-size: 13px; color: #aaa; }
+        .info-bar .fight-no span { color: #fff; font-weight: 700; }
 
-        .info-bar .channel-name {
-            font-size: 16px;
-            font-weight: 700;
-            color: #ffd200;
-        }
+        .footer { text-align: center; padding: 15px; color: #555; font-size: 13px; }
 
-        .info-bar .fight-no {
-            background: #2c2c4a;
-            padding: 4px 16px;
-            border-radius: 30px;
-            font-size: 13px;
-            color: #aaa;
-        }
-
-        .info-bar .fight-no span {
-            color: #fff;
-            font-weight: 700;
-        }
-
-        /* ===== SAVED CHANNELS ===== */
-        .saved-channels {
-            max-width: 1000px;
-            margin: 15px auto;
-            padding: 0 20px;
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
-
-        .saved-channels .tag {
-            background: #1a1a2e;
-            border: 1px solid #333;
-            border-radius: 20px;
-            padding: 6px 16px;
-            font-size: 13px;
-            color: #aaa;
-            cursor: pointer;
-            transition: 0.3s;
-        }
-
-        .saved-channels .tag:hover {
-            border-color: #f7971e;
-            color: #ffd200;
-        }
-
-        .saved-channels .tag.active {
-            border-color: #f7971e;
-            background: #252540;
-            color: #ffd200;
-        }
-
-        /* ===== RESPONSIVE ===== */
         @media (max-width: 640px) {
-            .header {
-                padding: 8px 12px;
-            }
-            .logo h1 {
-                font-size: 18px;
-            }
-            .status {
-                font-size: 11px;
-            }
-            .status .dot {
-                width: 8px;
-                height: 8px;
-            }
-            .url-bar {
-                padding: 10px 12px;
-                flex-direction: column;
-            }
-            .url-bar input {
-                width: 100%;
-                font-size: 13px;
-            }
-            .url-bar .btn {
-                width: 100%;
-                text-align: center;
-            }
-            .saved-channels {
-                gap: 6px;
-                padding: 0 12px;
-            }
-            .saved-channels .tag {
-                font-size: 11px;
-                padding: 4px 12px;
-            }
-            .info-bar {
-                padding: 10px 12px;
-                font-size: 13px;
-            }
+            .header { padding: 8px 12px; }
+            .logo h1 { font-size: 18px; }
+            .status { font-size: 11px; }
+            .url-bar { padding: 10px 12px; flex-direction: column; }
+            .url-bar input { width: 100%; font-size: 13px; }
+            .url-bar .btn { width: 100%; text-align: center; }
+            .info-bar { padding: 10px 12px; font-size: 13px; }
         }
     </style>
 </head>
 <body>
 
-    <!-- ===== HEADER ===== -->
     <header class="header">
         <div class="logo">
             <img src="https://player.cpro.uk/assets/images_v2/HH888/logo/logo.png" alt="HH888" />
@@ -302,44 +139,33 @@
         </div>
     </header>
 
-    <!-- ===== URL INPUT ===== -->
     <div class="url-bar">
         <input type="text" id="streamUrl" placeholder="បិទភ្ជាប់តំណវីដេអូ .m3u8 នៅទីនេះ..." />
         <button class="btn" onclick="loadStream()">▶️ ចាក់</button>
         <button class="btn btn-secondary" onclick="clearStream()">✖ លុប</button>
     </div>
 
-    <!-- ===== SAVED CHANNELS ===== -->
-    <div class="saved-channels" id="savedChannels">
-        <span style="color:#555;font-size:13px;display:flex;align-items:center;">📡 ឆានែល៖</span>
-        <span class="tag" data-url="">SBB</span>
-        <span class="tag" data-url="">PH</span>
-        <span class="tag" data-url="">BAC</span>
-        <span class="tag" data-url="">TD</span>
-        <span class="tag" data-url="">SGMC</span>
-    </div>
-
-    <!-- ===== PLAYER ===== -->
     <div class="player-wrapper">
         <video id="myPlayer" class="video-js vjs-default-skin vjs-big-play-centered" controls preload="auto" autoplay muted playsinline>
-            <p class="vjs-no-js">សូមបើក JavaScript ដើម្បីមើលវីដេអូ</p>
+            <p class="vjs-no-js">សូមបើក JavaScript</p>
         </video>
     </div>
 
-    <!-- ===== INFO BAR ===== -->
     <div class="info-bar">
         <span class="channel-name" id="currentChannel">📺 បញ្ចូល URL</span>
         <span class="fight-no">លេខគូ: <span id="fightNumber">--</span></span>
     </div>
 
-    <!-- ===== LIBRARIES ===== -->
+    <div class="footer">
+        <i class="fas fa-shield-alt"></i> Stream from HH888 &bull; Using Proxy Server
+    </div>
+
     <script src="https://vjs.zencdn.net/7.20.3/video.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/videojs-contrib-hls@5.15.0/dist/videojs-contrib-hls.min.js">
-    </script>
+    <script src="https://cdn.jsdelivr.net/npm/videojs-contrib-hls@5.15.0/dist/videojs-contrib-hls.min.js"></script>
 
     <script>
         // ================================================================
-        //  PLAYER INITIALIZATION
+        //  PLAYER
         // ================================================================
         const player = videojs('myPlayer', {
             html5: {
@@ -359,7 +185,7 @@
         let currentUrl = '';
 
         // ================================================================
-        //  TIME DISPLAY
+        //  TIME
         // ================================================================
         function updateTime() {
             const now = new Date();
@@ -374,22 +200,25 @@
         setInterval(updateTime, 1000);
 
         // ================================================================
-        //  LOAD STREAM
+        //  LOAD STREAM VIA PROXY
         // ================================================================
-        function loadStream(url) {
-            let streamUrl = url || document.getElementById('streamUrl').value.trim();
+        function loadStream() {
+            let url = document.getElementById('streamUrl').value.trim();
 
-            if (!streamUrl) {
+            if (!url) {
                 alert('សូមបិទភ្ជាប់តំណវីដេអូ .m3u8 ជាមុនសិន!');
                 return;
             }
 
-            currentUrl = streamUrl;
-            document.getElementById('currentChannel').textContent = '📺 ' + getChannelName(streamUrl);
+            // ===== Use proxy =====
+            const proxyUrl = `/proxy?url=${encodeURIComponent(url)}`;
+            currentUrl = proxyUrl;
 
-            // ===== Load video =====
+            document.getElementById('currentChannel').textContent = '📺 ' + getChannelName(url);
+            document.getElementById('liveStatus').textContent = '🔄 LOADING...';
+
             player.src({
-                src: streamUrl,
+                src: proxyUrl,
                 type: 'application/x-mpegURL'
             });
 
@@ -399,9 +228,6 @@
                 document.getElementById('liveStatus').textContent = '⏸️ PAUSED';
             });
 
-            document.getElementById('liveStatus').textContent = '🔄 LOADING...';
-
-            // ===== Update fight number =====
             setTimeout(() => {
                 const fightNo = document.getElementById('fightNumber');
                 if (fightNo.textContent === '--') {
@@ -409,11 +235,11 @@
                 }
             }, 2000);
 
-            console.log('📺 Loading stream:', streamUrl);
+            console.log('📺 Loading via proxy:', url);
         }
 
         // ================================================================
-        //  CLEAR STREAM
+        //  CLEAR
         // ================================================================
         function clearStream() {
             document.getElementById('streamUrl').value = '';
@@ -422,11 +248,10 @@
             document.getElementById('fightNumber').textContent = '--';
             document.getElementById('liveStatus').textContent = '⏸️ STOPPED';
             currentUrl = '';
-            console.log('⏹️ Stream cleared');
         }
 
         // ================================================================
-        //  GET CHANNEL NAME FROM URL
+        //  UTILITY
         // ================================================================
         function getChannelName(url) {
             const names = ['SBB', 'V168', 'PH', 'BAC', 'TD', 'W8_BAC1', 'W8_BAC2', 'W8_TD1', 'W8_TD2', 'SGMC'];
@@ -437,65 +262,32 @@
         }
 
         // ================================================================
-        //  SAVED CHANNELS - CLICK
-        // ================================================================
-        document.querySelectorAll('.saved-channels .tag').forEach(tag => {
-            tag.addEventListener('click', function() {
-                const url = this.dataset.url;
-                if (url) {
-                    document.getElementById('streamUrl').value = url;
-                    loadStream(url);
-                } else {
-                    alert('សូមកំណត់តំណវីដេអូសម្រាប់ឆានែលនេះក្នុងកូដ JavaScript!');
-                }
-            });
-        });
-
-        // ================================================================
         //  PLAYER EVENTS
         // ================================================================
-        player.on('loadeddata', function() {
-            document.getElementById('liveStatus').textContent = '🟢 LIVE';
-        });
-
-        player.on('error', function() {
-            document.getElementById('liveStatus').textContent = '❌ ERROR';
-            console.error('Player error:', player.error());
-        });
-
-        player.on('waiting', function() {
-            document.getElementById('liveStatus').textContent = '⏳ BUFFERING...';
-        });
-
-        player.on('canplay', function() {
-            document.getElementById('liveStatus').textContent = '🟢 LIVE';
-        });
+        player.on('loadeddata', () => { document.getElementById('liveStatus').textContent = '🟢 LIVE'; });
+        player.on('error', () => { document.getElementById('liveStatus').textContent = '❌ ERROR'; });
+        player.on('waiting', () => { document.getElementById('liveStatus').textContent = '⏳ BUFFERING...'; });
+        player.on('canplay', () => { document.getElementById('liveStatus').textContent = '🟢 LIVE'; });
 
         // ================================================================
         //  KEYBOARD SHORTCUTS
         // ================================================================
         document.addEventListener('keydown', function(e) {
-            if (e.key === 'Enter') {
-                loadStream();
-            }
+            if (e.key === 'Enter') { loadStream(); }
             if (e.key === 'r' || e.key === 'R') {
                 if (e.ctrlKey || e.metaKey) return;
                 e.preventDefault();
-                if (currentUrl) loadStream(currentUrl);
+                if (currentUrl) loadStream();
             }
             if (e.key === 'f' || e.key === 'F') {
                 if (e.ctrlKey || e.metaKey) return;
                 e.preventDefault();
-                if (document.fullscreenElement) {
-                    document.exitFullscreen();
-                } else {
-                    document.documentElement.requestFullscreen();
-                }
+                document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen();
             }
         });
 
         // ================================================================
-        //  FIGHT NUMBER - AUTO UPDATE
+        //  FIGHT NUMBER
         // ================================================================
         setInterval(() => {
             const fightNo = document.getElementById('fightNumber');
@@ -512,25 +304,8 @@
             }
         }, 8000);
 
-        // ================================================================
-        //  CONSOLE
-        // ================================================================
-        console.log('✅ HH888 Live Player is ready!');
-        console.log('📌 How to use:');
-        console.log('1. Get .m3u8 URL from zh888.vip (F12 → Network → Media)');
-        console.log('2. Paste URL and click Play');
+        console.log('✅ HH888 Live with Proxy is ready!');
         console.log('📌 Press Enter to play | R to reload | F for fullscreen');
-
-        // ================================================================
-        //  SET DEFAULT CHANNEL URLS (ប្រសិនបើមាន)
-        // ================================================================
-        // ប្រសិនបើអូនមានតំណវីដេអូផ្ទាល់ សូមដាក់នៅទីនេះ
-        // const CHANNEL_URLS = {
-        //     SBB: 'https://cc.realtimevideo.cc/live/frmsbvdolive.m3u8',
-        //     PH: 'https://cc.realtimevideo.cc/live/COCKFIGHPHH.m3u8',
-        // };
-        // document.querySelector('.tag[data-url=""]:nth-child(2)').dataset.url = CHANNEL_URLS.SBB;
-        // document.querySelector('.tag[data-url=""]:nth-child(3)').dataset.url = CHANNEL_URLS.PH;
     </script>
 
 </body>
