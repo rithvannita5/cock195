@@ -3,8 +3,11 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="referrer" content="no-referrer-when-downgrade" />
     <title>HH888 Live Stream</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
     <style>
+        /* ===== RESET & BASE ===== */
         * {
             margin: 0;
             padding: 0;
@@ -59,7 +62,7 @@
         }
 
         .status-badge {
-            background: #2ecc71;
+            background: #f39c12;
             padding: 6px 18px;
             border-radius: 30px;
             font-size: 14px;
@@ -68,6 +71,15 @@
             display: flex;
             align-items: center;
             gap: 8px;
+            transition: background 0.5s ease;
+        }
+
+        .status-badge.live {
+            background: #2ecc71;
+        }
+
+        .status-badge.offline {
+            background: #e74c3c;
         }
 
         .status-badge .dot {
@@ -135,13 +147,14 @@
             margin-top: 4px;
         }
 
-        /* ===== VIDEO IFRAME ===== */
+        /* ===== VIDEO PLAYER ===== */
         .player-wrapper {
             background: #111;
             border-radius: 20px;
             overflow: hidden;
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
             position: relative;
+            min-height: 400px;
         }
 
         .player-wrapper iframe {
@@ -219,6 +232,10 @@
             color: #555;
             font-size: 13px;
         }
+
+        .footer i {
+            margin-right: 6px;
+        }
     </style>
 </head>
 <body>
@@ -231,9 +248,9 @@
                 <img src="https://player.cpro.uk/assets/images_v2/HH888/logo/logo.png" alt="HH888" />
                 <h1>HH888</h1>
             </div>
-            <div class="status-badge">
+            <div class="status-badge" id="statusBadge">
                 <span class="dot"></span>
-                <span id="liveStatus">LIVE</span>
+                <span id="liveStatus">CONNECTING...</span>
             </div>
         </header>
 
@@ -247,9 +264,11 @@
             <iframe
                 id="myIframe"
                 src=""
+                allow="autoplay; encrypted-media; fullscreen"
                 allowfullscreen
                 loading="lazy"
                 referrerpolicy="no-referrer-when-downgrade"
+                sandbox="allow-same-origin allow-scripts allow-forms allow-popups allow-modals"
             ></iframe>
 
             <!-- ===== INFO BAR ===== -->
@@ -260,16 +279,13 @@
         </div>
 
         <div class="footer">
-            <i class="fas fa-shield-alt"></i> Stream from HH888
+            <i class="fas fa-shield-alt"></i> Stream from HH888 &bull; Using iframe for compatibility
         </div>
     </div>
 
-    <!-- ===== Font Awesome for icons ===== -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
-
     <script>
         // ============================================================
-        //  DANH SÁCH CHANNEL (យកពីកូដដើម)
+        //  DANH SÁCH CHANNEL
         // ============================================================
         const channels = [{
             id: 8,
@@ -324,11 +340,19 @@
         }];
 
         // ============================================================
-        //  SWITCH CHANNEL
+        //  VARIABLES
         // ============================================================
         let currentChannel = channels[0];
         const iframe = document.getElementById('myIframe');
+        const statusBadge = document.getElementById('statusBadge');
+        const liveStatus = document.getElementById('liveStatus');
+        let reconnectAttempts = 0;
+        const MAX_RECONNECT_ATTEMPTS = 5;
+        let timeoutId = null;
 
+        // ============================================================
+        //  RENDER CHANNELS
+        // ============================================================
         function renderChannels() {
             const grid = document.getElementById('channelGrid');
             grid.innerHTML = '';
@@ -347,9 +371,29 @@
             });
         }
 
+        // ============================================================
+        //  UPDATE STATUS
+        // ============================================================
+        function updateStatus(status, isLive = false) {
+            liveStatus.textContent = status;
+            statusBadge.className = 'status-badge';
+            if (isLive) {
+                statusBadge.classList.add('live');
+            } else if (status.includes('ERROR') || status.includes('OFFLINE')) {
+                statusBadge.classList.add('offline');
+            }
+        }
+
+        // ============================================================
+        //  SWITCH CHANNEL
+        // ============================================================
         function switchChannel(channel) {
             if (!channel || !channel.url) return;
 
+            // Reset reconnect attempts
+            reconnectAttempts = 0;
+
+            // Cập nhật channel hiện tại
             currentChannel = channel;
 
             // Cập nhật UI
@@ -358,40 +402,96 @@
             });
             document.getElementById('currentChannelName').textContent = channel.name;
             document.getElementById('fightNumber').textContent = '--';
-            document.getElementById('liveStatus').textContent = '⏳ LOADING...';
+            updateStatus('🔄 LOADING...');
 
-            // ===== 🔥 សំខាន់៖ ប្រើ iframe =====
+            // Clear timeout cũ
+            if (timeoutId) {
+                clearTimeout(timeoutId);
+                timeoutId = null;
+            }
+
+            // ===== LOAD VIDEO INTO IFRAME =====
             iframe.src = channel.url;
 
-            // បើកដោយស្វ័យប្រវត្តិ
-            iframe.onload = function() {
-                document.getElementById('liveStatus').textContent = '🟢 LIVE';
-            };
-
-            // ប្រសិនបើផ្ទុកមិនបាន
-            iframe.onerror = function() {
-                document.getElementById('liveStatus').textContent = '❌ ERROR';
-            };
-
-            // បន្ទាប់ពី 5 វិនាទី បើនៅតែ LOADING
-            setTimeout(() => {
-                const status = document.getElementById('liveStatus');
-                if (status.textContent === '⏳ LOADING...') {
-                    status.textContent = '🔄 CONNECTING...';
+            // Timeout nếu load quá lâu
+            timeoutId = setTimeout(() => {
+                const currentStatus = liveStatus.textContent;
+                if (currentStatus === '🔄 LOADING...' || currentStatus === '🔄 RECONNECTING...') {
+                    updateStatus('⏳ TIMEOUT - RETRYING...');
+                    // Thử load lại
+                    iframe.src = channel.url;
                 }
-            }, 5000);
+            }, 15000);
 
-            // Fight number
-            setTimeout(() => {
+            // ===== EVENT HANDLERS =====
+            iframe.onload = function() {
+                if (timeoutId) {
+                    clearTimeout(timeoutId);
+                    timeoutId = null;
+                }
+                updateStatus('🟢 LIVE', true);
+                reconnectAttempts = 0;
+
+                // Cập nhật fight number
                 const fightNo = document.getElementById('fightNumber');
                 if (fightNo.textContent === '--') {
                     fightNo.textContent = String(Math.floor(Math.random() * 90) + 10);
                 }
-            }, 2000);
+            };
+
+            iframe.onerror = function() {
+                if (timeoutId) {
+                    clearTimeout(timeoutId);
+                    timeoutId = null;
+                }
+                handleConnectionError();
+            };
+
+            // Thêm event listener cho lỗi tải
+            iframe.addEventListener('loaderror', function() {
+                handleConnectionError();
+            });
         }
 
         // ============================================================
-        //  FIGHT NUMBER - CẬP NHẬT TỰ ĐỘNG
+        //  HANDLE CONNECTION ERROR
+        // ============================================================
+        function handleConnectionError() {
+            if (reconnectAttempts < MAX_RECONNECT_ATTEMPTS) {
+                reconnectAttempts++;
+                const delay = 3000 * reconnectAttempts;
+                updateStatus(`🔄 RECONNECTING (${reconnectAttempts}/${MAX_RECONNECT_ATTEMPTS})...`);
+                
+                setTimeout(() => {
+                    console.log(`🔄 Reconnect attempt ${reconnectAttempts} for ${currentChannel.name}`);
+                    iframe.src = currentChannel.url;
+                }, delay);
+            } else {
+                updateStatus('❌ OFFLINE - PLEASE REFRESH');
+                // Hiển thị nút refresh
+                const refreshBtn = document.createElement('button');
+                refreshBtn.textContent = '🔄 Refresh';
+                refreshBtn.style.cssText = `
+                    background: #f7971e;
+                    color: #fff;
+                    border: none;
+                    padding: 8px 20px;
+                    border-radius: 8px;
+                    cursor: pointer;
+                    font-weight: 600;
+                    margin-left: 10px;
+                `;
+                refreshBtn.onclick = function() {
+                    reconnectAttempts = 0;
+                    switchChannel(currentChannel);
+                    this.remove();
+                };
+                document.querySelector('.status-badge').appendChild(refreshBtn);
+            }
+        }
+
+        // ============================================================
+        //  FIGHT NUMBER - AUTO UPDATE
         // ============================================================
         setInterval(() => {
             const fightNo = document.getElementById('fightNumber');
@@ -409,12 +509,32 @@
         }, 8000);
 
         // ============================================================
-        //  KHỞI TẠO APP
+        //  KEYBOARD SHORTCUTS
+        // ============================================================
+        document.addEventListener('keydown', function(e) {
+            // Press 'R' to refresh
+            if (e.key === 'r' || e.key === 'R') {
+                if (e.ctrlKey || e.metaKey) return;
+                e.preventDefault();
+                switchChannel(currentChannel);
+            }
+            // Press 'F' for fullscreen
+            if (e.key === 'f' || e.key === 'F') {
+                if (e.ctrlKey || e.metaKey) return;
+                if (iframe.requestFullscreen) {
+                    iframe.requestFullscreen();
+                }
+            }
+        });
+
+        // ============================================================
+        //  INITIALIZE
         // ============================================================
         renderChannels();
         switchChannel(currentChannel);
 
-        console.log('✅ HH888 Live Web App with IFRAME is ready!');
+        console.log('✅ HH888 Live Web App is ready!');
+        console.log('📺 Press R to refresh, F for fullscreen');
     </script>
 
 </body>
