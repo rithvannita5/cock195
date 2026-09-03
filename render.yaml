@@ -1,0 +1,9 @@
+services:
+  - type: web
+    name: hh888-live-stream
+    env: static
+    staticPublishPath: .
+    headers:
+      - path: /*
+        name: X-Frame-Options
+        value: sameorigin
