@@ -3,323 +3,142 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>HH888 Live Stream</title>
+    <title>HH888 Live</title>
     <style>
-        /* ===== RESET ===== */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            background: #0a0a0a;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-        }
-
-        .container {
-            width: 100%;
-            max-width: 1000px;
-            background: #111;
-            border-radius: 20px;
-            overflow: hidden;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
-        }
-
-        /* ===== HEADER ===== */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background: #0a0a0a; font-family: 'Segoe UI', Arial, sans-serif; min-height: 100vh; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+        
         .header {
-            background: #0d0d1a;
-            padding: 16px 24px;
+            background: #111;
+            padding: 12px 20px;
             display: flex;
             align-items: center;
             justify-content: space-between;
             border-bottom: 2px solid #222;
+            position: sticky;
+            top: 0;
+            z-index: 100;
             flex-wrap: wrap;
-            gap: 12px;
-        }
-
-        .logo {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .logo img {
-            width: 44px;
-            height: 44px;
-            border-radius: 10px;
-            background: #1a1a2e;
-            padding: 4px;
-        }
-
-        .logo h1 {
-            font-size: 24px;
-            font-weight: 700;
-            background: linear-gradient(135deg, #f7971e, #ffd200);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .status {
-            display: flex;
-            align-items: center;
             gap: 10px;
-            font-size: 14px;
-            color: #aaa;
         }
+        .logo { display: flex; align-items: center; gap: 12px; }
+        .logo img { width: 44px; height: 44px; border-radius: 10px; background: #1a1a2e; padding: 4px; }
+        .logo h1 { font-size: 24px; font-weight: 700; background: linear-gradient(135deg, #f7971e, #ffd200); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        
+        .status { display: flex; align-items: center; gap: 10px; font-size: 14px; color: #aaa; }
+        .status .dot { width: 12px; height: 12px; border-radius: 50%; background: #2ecc71; animation: blink 1.2s infinite; display: inline-block; }
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.2; } }
+        .status .live-text { color: #2ecc71; font-weight: 600; }
 
-        .status .dot {
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            background: #e74c3c;
-            display: inline-block;
-            transition: background 0.3s;
-        }
-
-        .status .dot.live {
-            background: #2ecc71;
-            animation: blink 1.2s infinite;
-        }
-
-        @keyframes blink {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.2; }
-        }
-
-        .status .live-text {
-            font-weight: 600;
-            transition: color 0.3s;
-        }
-
-        .status .live-text.live {
-            color: #2ecc71;
-        }
-
-        .status .live-text.offline {
-            color: #e74c3c;
-        }
-
-        /* ===== PLAYER ===== */
-        .player-wrapper {
-            background: #000;
-            position: relative;
-        }
-
-        .player-wrapper video {
+        .iframe-container {
             width: 100%;
-            height: auto;
-            aspect-ratio: 16 / 9;
+            height: calc(100vh - 160px);
             background: #000;
-            display: block;
+            border-radius: 15px;
+            overflow: hidden;
+        }
+        .iframe-container iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            background: #000;
         }
 
-        /* ===== INFO BAR ===== */
         .info-bar {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 14px 24px;
+            padding: 12px 20px;
             background: #0d0d1a;
             border-top: 1px solid #222;
             flex-wrap: wrap;
             gap: 10px;
+            margin-top: 10px;
+            border-radius: 0 0 15px 15px;
         }
+        .info-bar .channel-name { font-size: 16px; font-weight: 700; color: #ffd200; }
+        .info-bar .fight-no { background: #2c2c4a; padding: 4px 16px; border-radius: 30px; font-size: 13px; color: #aaa; }
+        .info-bar .fight-no span { color: #fff; font-weight: 700; }
 
-        .info-bar .channel-name {
-            font-size: 16px;
-            font-weight: 700;
-            color: #ffd200;
-        }
+        .footer { text-align: center; padding: 12px; color: #555; font-size: 12px; }
+        .footer i { margin-right: 6px; }
 
-        .info-bar .fight-no {
-            background: #2c2c4a;
-            padding: 4px 16px;
-            border-radius: 30px;
-            font-size: 13px;
-            color: #aaa;
-        }
-
-        .info-bar .fight-no span {
-            color: #fff;
-            font-weight: 700;
-        }
-
-        /* ===== FOOTER ===== */
-        .footer {
+        .token-box {
             background: #0d0d1a;
-            text-align: center;
-            padding: 12px;
-            color: #555;
-            font-size: 12px;
-            border-top: 1px solid #1a1a2e;
-        }
-
-        .footer i {
-            margin-right: 6px;
-        }
-
-        /* ===== TOKEN INFO ===== */
-        .token-info {
-            background: #0d0d1a;
-            padding: 10px 24px;
+            padding: 8px 20px;
             border-bottom: 1px solid #1a1a2e;
             display: flex;
             align-items: center;
             justify-content: space-between;
             flex-wrap: wrap;
             gap: 8px;
-        }
-
-        .token-info .label {
-            color: #555;
             font-size: 12px;
-        }
-
-        .token-info .value {
             color: #888;
-            font-size: 11px;
-            word-break: break-all;
-            max-width: 600px;
         }
+        .token-box .label { color: #555; }
+        .token-box .value { word-break: break-all; max-width: 500px; }
+        .token-box .expiry { color: #f39c12; font-weight: 600; }
 
-        .token-info .expiry {
-            color: #f39c12;
-            font-size: 12px;
-            font-weight: 600;
-        }
-
-        .token-info .expiry.expired {
-            color: #e74c3c;
-        }
-
-        /* ===== RESPONSIVE ===== */
         @media (max-width: 640px) {
-            .header {
-                padding: 12px 16px;
-            }
-            .logo h1 {
-                font-size: 18px;
-            }
-            .status {
-                font-size: 12px;
-            }
-            .status .dot {
-                width: 10px;
-                height: 10px;
-            }
-            .info-bar {
-                padding: 10px 16px;
-                font-size: 13px;
-            }
-            .token-info {
-                padding: 8px 16px;
-                flex-direction: column;
-                align-items: flex-start;
-            }
-            .token-info .value {
-                max-width: 100%;
-                font-size: 10px;
-            }
-        }
-
-        /* ===== LOADING OVERLAY ===== */
-        .loading-overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: #0a0a0a;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            color: #fff;
-            z-index: 10;
-            transition: opacity 0.5s ease;
-        }
-
-        .loading-overlay.hidden {
-            opacity: 0;
-            pointer-events: none;
-        }
-
-        .loading-overlay .spinner {
-            width: 50px;
-            height: 50px;
-            border: 4px solid #222;
-            border-top-color: #f7971e;
-            border-radius: 50%;
-            animation: spin 0.8s linear infinite;
-            margin-bottom: 16px;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        .loading-overlay p {
-            font-size: 14px;
-            color: #888;
+            .header { padding: 8px 12px; }
+            .logo h1 { font-size: 18px; }
+            .status { font-size: 12px; }
+            .iframe-container { height: calc(100vh - 180px); }
+            .token-box { font-size: 10px; padding: 6px 12px; flex-direction: column; align-items: flex-start; }
+            .token-box .value { max-width: 100%; }
         }
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <!-- ===== HEADER ===== -->
-        <header class="header">
-            <div class="logo">
-                <img src="https://player.cpro.uk/assets/images_v2/HH888/logo/logo.png" alt="HH888" />
-                <h1>HH888</h1>
-            </div>
-            <div class="status">
-                <span class="dot" id="statusDot"></span>
-                <span class="live-text" id="liveStatus">កំពុងភ្ជាប់...</span>
-                <span id="timeDisplay" style="color:#555;font-size:12px;margin-left:5px;"></span>
-            </div>
-        </header>
-
-        <!-- ===== TOKEN INFO ===== -->
-        <div class="token-info">
-            <span class="label">🔑 Token:</span>
-            <span class="value" id="tokenDisplay">eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...</span>
-            <span class="expiry" id="expiryDisplay">⏳ ផុតកំណត់: 03:01 PM</span>
+    <!-- ===== HEADER ===== -->
+    <header class="header">
+        <div class="logo">
+            <img src="https://player.cpro.uk/assets/images_v2/HH888/logo/logo.png" alt="HH888" />
+            <h1>HH888</h1>
         </div>
-
-        <!-- ===== PLAYER ===== -->
-        <div class="player-wrapper">
-            <div class="loading-overlay" id="loadingOverlay">
-                <div class="spinner"></div>
-                <p>⏳ កំពុងផ្ទុកវីដេអូ...</p>
-            </div>
-            <video id="media_player" autoplay playsinline webkit-playsinline controls></video>
+        <div class="status">
+            <span class="dot"></span>
+            <span class="live-text" id="liveStatus">LIVE</span>
+            <span id="timeDisplay" style="color:#555;font-size:12px;margin-left:5px;"></span>
         </div>
+    </header>
 
-        <!-- ===== INFO BAR ===== -->
-        <div class="info-bar">
-            <span class="channel-name" id="channelName">📺 CHGW24</span>
-            <span class="fight-no">លេខគូ: <span id="fightNumber">--</span></span>
-        </div>
-
-        <!-- ===== FOOTER ===== -->
-        <div class="footer">
-            <i class="fas fa-shield-alt"></i> Stream from HH888 &bull; Using direct HLS stream
-        </div>
+    <!-- ===== TOKEN INFO ===== -->
+    <div class="token-box">
+        <span class="label">🔑 Token:</span>
+        <span class="value" id="tokenDisplay">eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...</span>
+        <span class="expiry" id="expiryDisplay">⏳ ផុតកំណត់: --</span>
     </div>
 
-    <!-- ===== Font Awesome ===== -->
+    <!-- ===== IFRAME ===== -->
+    <div class="iframe-container">
+        <iframe
+            id="myIframe"
+            src=""
+            allow="autoplay; encrypted-media; fullscreen"
+            allowfullscreen
+            loading="lazy"
+            referrerpolicy="no-referrer-when-downgrade"
+        ></iframe>
+    </div>
+
+    <!-- ===== INFO BAR ===== -->
+    <div class="info-bar">
+        <span class="channel-name" id="channelName">📺 CHGW24</span>
+        <span class="fight-no">លេខគូ: <span id="fightNumber">--</span></span>
+    </div>
+
+    <div class="footer">
+        <i class="fas fa-shield-alt"></i> Stream from HH888 &bull; Using iframe
+    </div>
+
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
 
     <script>
         // ================================================================
-        //  🔑 TOKEN ថ្មីរបស់អូន
+        //  🔑 TOKEN របស់អូន
         // ================================================================
         const TOKEN = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NTU0NTIzMCwidXNlcm5hbWUiOiJBQlBQR0JHRzI2MiIsImlhdCI6MTc4ODQyMTY3MCwiZXhwIjoxNzg4NDI1MjcwfQ.MmtZOm515ktxNRcZDpQB3l6cuYKHOzBUR3JGPPoe6YQ';
 
@@ -331,14 +150,12 @@
         // ================================================================
         //  DOM ELEMENTS
         // ================================================================
-        const video = document.getElementById('media_player');
-        const statusDot = document.getElementById('statusDot');
-        const liveStatus = document.getElementById('liveStatus');
+        const iframe = document.getElementById('myIframe');
         const timeDisplay = document.getElementById('timeDisplay');
-        const loadingOverlay = document.getElementById('loadingOverlay');
         const fightNumber = document.getElementById('fightNumber');
         const tokenDisplay = document.getElementById('tokenDisplay');
         const expiryDisplay = document.getElementById('expiryDisplay');
+        const liveStatus = document.getElementById('liveStatus');
 
         // ================================================================
         //  DISPLAY TIME
@@ -368,7 +185,7 @@
                 const isExpired = now > expDate;
 
                 expiryDisplay.textContent = `⏳ ផុតកំណត់: ${expDate.toLocaleTimeString('km-KH', { hour: '2-digit', minute: '2-digit', hour12: true })}`;
-                expiryDisplay.className = 'expiry' + (isExpired ? ' expired' : '');
+                expiryDisplay.style.color = isExpired ? '#e74c3c' : '#f39c12';
             } catch (e) {
                 expiryDisplay.textContent = '⚠️ មិនអាចអាន Token';
             }
@@ -376,72 +193,30 @@
         displayTokenInfo();
 
         // ================================================================
-        //  UPDATE STATUS
+        //  LOAD IFRAME
         // ================================================================
-        function setStatus(text, isLive = false) {
-            liveStatus.textContent = text;
-            liveStatus.className = 'live-text' + (isLive ? ' live' : '');
-            statusDot.className = 'dot' + (isLive ? ' live' : '');
+        function loadStream() {
+            iframe.src = STREAM_URL;
+            liveStatus.textContent = '🔄 LOADING...';
+            console.log('📺 Loading stream:', STREAM_URL);
+
+            // Update fight number
+            setTimeout(() => {
+                const num = Math.floor(Math.random() * 90) + 10;
+                fightNumber.textContent = num;
+                liveStatus.textContent = '🟢 LIVE';
+            }, 3000);
         }
 
         // ================================================================
-        //  LOAD VIDEO
+        //  IFRAME EVENTS
         // ================================================================
-        function loadVideo() {
-            setStatus('⏳ កំពុងផ្ទុក...', false);
-            loadingOverlay.classList.remove('hidden');
-
-            video.src = STREAM_URL;
-            video.load();
-
-            video.play().catch(err => {
-                console.warn('Autoplay blocked:', err);
-                setStatus('▶️ ចុច Play ដើម្បីចាក់', false);
-                loadingOverlay.classList.add('hidden');
-            });
-        }
-
-        // ================================================================
-        //  VIDEO EVENTS
-        // ================================================================
-        video.addEventListener('canplay', function() {
-            setStatus('🟢 LIVE', true);
-            loadingOverlay.classList.add('hidden');
-
-            const num = Math.floor(Math.random() * 90) + 10;
-            fightNumber.textContent = num;
+        iframe.addEventListener('load', function() {
+            liveStatus.textContent = '🟢 LIVE';
         });
 
-        video.addEventListener('waiting', function() {
-            setStatus('⏳ កំពុងផ្ទុក...', false);
-        });
-
-        video.addEventListener('playing', function() {
-            setStatus('🟢 LIVE', true);
-            loadingOverlay.classList.add('hidden');
-        });
-
-        video.addEventListener('error', function() {
-            const error = video.error;
-            console.error('Video error:', error);
-
-            let errorMsg = '❌ កំហុសមិនស្គាល់';
-            if (error) {
-                switch (error.code) {
-                    case 1: errorMsg = '❌ ការផ្ទុកត្រូវបានបញ្ឈប់';
-                        break;
-                    case 2: errorMsg = '❌ បញ្ហាបណ្តាញ ឬម៉ាស៊ីនមេ';
-                        break;
-                    case 3: errorMsg = '❌ ទម្រង់វីដេអូមិនគាំទ្រ';
-                        break;
-                    case 4: errorMsg = '❌ រកមិនឃើញវីដេអូ';
-                        break;
-                    default: errorMsg = `❌ កំហុសលេខ ${error.code}`;
-                }
-            }
-
-            setStatus(errorMsg, false);
-            loadingOverlay.classList.add('hidden');
+        iframe.addEventListener('error', function() {
+            liveStatus.textContent = '❌ ERROR';
         });
 
         // ================================================================
@@ -468,7 +243,7 @@
             if (e.key === 'r' || e.key === 'R') {
                 if (e.ctrlKey || e.metaKey) return;
                 e.preventDefault();
-                loadVideo();
+                loadStream();
             }
             if (e.key === 'f' || e.key === 'F') {
                 if (e.ctrlKey || e.metaKey) return;
@@ -479,24 +254,16 @@
                     document.documentElement.requestFullscreen();
                 }
             }
-            if (e.key === ' ') {
-                e.preventDefault();
-                if (video.paused) {
-                    video.play();
-                } else {
-                    video.pause();
-                }
-            }
         });
 
         // ================================================================
         //  INITIALIZE
         // ================================================================
-        loadVideo();
+        loadStream();
 
-        console.log('✅ HH888 Live Stream is ready!');
+        console.log('✅ HH888 Live with iframe is ready!');
         console.log('📺 Stream URL:', STREAM_URL);
-        console.log('⌨️  R = Reload | F = Fullscreen | Space = Play/Pause');
+        console.log('⌨️  R = Reload | F = Fullscreen');
     </script>
 
 </body>
