@@ -31,32 +31,9 @@
         @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.2; } }
         .status .live-text { color: #2ecc71; font-weight: 600; }
 
-        /* ===== CHANNEL SELECTOR ===== */
-        .channel-grid {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-            padding: 12px 0;
-            border-bottom: 1px solid #222;
-            margin-bottom: 12px;
-        }
-        .channel-grid .btn {
-            background: #1a1a2e;
-            border: 2px solid transparent;
-            border-radius: 10px;
-            padding: 8px 16px;
-            color: #aaa;
-            font-size: 13px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: 0.3s;
-        }
-        .channel-grid .btn:hover { border-color: #f7971e; color: #fff; }
-        .channel-grid .btn.active { border-color: #f7971e; background: #252540; color: #ffd200; }
-
         .iframe-container {
             width: 100%;
-            height: calc(100vh - 200px);
+            height: calc(100vh - 160px);
             background: #000;
             border-radius: 15px;
             overflow: hidden;
@@ -87,54 +64,29 @@
         .footer { text-align: center; padding: 12px; color: #555; font-size: 12px; }
         .footer i { margin-right: 6px; }
 
-        /* ===== URL INPUT ===== */
-        .url-bar {
+        .token-info {
             background: #0d0d1a;
             padding: 8px 20px;
+            border-bottom: 1px solid #1a1a2e;
             display: flex;
             align-items: center;
-            gap: 12px;
-            border-bottom: 1px solid #1a1a2e;
+            justify-content: space-between;
             flex-wrap: wrap;
+            gap: 8px;
+            font-size: 12px;
+            color: #888;
         }
-        .url-bar input {
-            flex: 1;
-            background: #0a0a0a;
-            border: 1px solid #333;
-            border-radius: 8px;
-            padding: 8px 14px;
-            color: #fff;
-            font-size: 13px;
-            min-width: 200px;
-            outline: none;
-        }
-        .url-bar input:focus { border-color: #f7971e; }
-        .url-bar input::placeholder { color: #555; }
-        .url-bar .btn {
-            background: #f7971e;
-            color: #0a0a0a;
-            border: none;
-            padding: 8px 20px;
-            border-radius: 8px;
-            font-weight: 700;
-            font-size: 13px;
-            cursor: pointer;
-            transition: 0.3s;
-            white-space: nowrap;
-        }
-        .url-bar .btn:hover { background: #ffd200; transform: scale(1.02); }
-        .url-bar .btn-secondary { background: #333; color: #fff; }
-        .url-bar .btn-secondary:hover { background: #444; }
+        .token-info .label { color: #555; }
+        .token-info .value { word-break: break-all; max-width: 500px; font-size: 11px; }
+        .token-info .expiry { color: #f39c12; font-weight: 600; }
 
         @media (max-width: 640px) {
             .header { padding: 8px 12px; }
             .logo h1 { font-size: 18px; }
             .status { font-size: 12px; }
-            .iframe-container { height: calc(100vh - 260px); }
-            .channel-grid .btn { font-size: 11px; padding: 6px 12px; }
-            .url-bar { flex-direction: column; padding: 8px 12px; }
-            .url-bar input { width: 100%; font-size: 12px; }
-            .url-bar .btn { width: 100%; text-align: center; }
+            .iframe-container { height: calc(100vh - 200px); }
+            .token-info { font-size: 10px; padding: 6px 12px; flex-direction: column; align-items: flex-start; }
+            .token-info .value { max-width: 100%; }
         }
     </style>
 </head>
@@ -152,41 +104,38 @@
         </div>
     </header>
 
-    <!-- ===== URL INPUT ===== -->
-    <div class="url-bar">
-        <input type="text" id="streamUrl" placeholder="បិទភ្ជាប់តំណវីដេអូ .m3u8 នៅទីនេះ..." />
-        <button class="btn" onclick="loadStream()">▶️ ចាក់</button>
-        <button class="btn btn-secondary" onclick="reloadStream()">🔄 ផ្ទុកឡើងវិញ</button>
+    <div class="token-info">
+        <span class="label">🔑 Token:</span>
+        <span class="value" id="tokenDisplay">eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...</span>
+        <span class="expiry" id="expiryDisplay">⏳ ផុតកំណត់: --</span>
     </div>
 
-    <!-- ===== CHANNEL SELECTOR ===== -->
-    <div class="channel-grid" id="channelGrid">
-        <button class="btn active" data-url="https://cc.realtimevideo.cc/live/chgw24?origin=sb24">📺 CHGW24</button>
-        <button class="btn" data-url="https://cc.realtimevideo.cc/live/COCKFIGHPHH?origin=HH888">🐔 PH</button>
-        <button class="btn" data-url="https://cc.realtimevideo.cc/live/frmsbvdolive?origin=HH888">🐓 SBB</button>
-        <button class="btn" data-url="https://cc.realtimevideo.cc/live/HH888SEXYBACC?origin=HH888">🃏 BAC</button>
-        <button class="btn" data-url="https://cc.realtimevideo.cc/live/HH888SEXYTIGERDRAGON?origin=HH888">🐉 TD</button>
-        <button class="btn" data-url="https://cc.realtimevideo.cc/live/COCKFIGHPH1?">🐓 SGMC</button>
-    </div>
-
-    <!-- ===== IFRAME ===== -->
     <div class="iframe-container">
         <iframe id="myIframe" src="" allow="autoplay; encrypted-media; fullscreen" allowfullscreen loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
     </div>
 
-    <!-- ===== INFO BAR ===== -->
     <div class="info-bar">
         <span class="channel-name" id="channelName">📺 CHGW24</span>
         <span class="fight-no">លេខគូ: <span id="fightNumber">--</span></span>
     </div>
 
     <div class="footer">
-        <i class="fas fa-shield-alt"></i> Stream from HH888 &bull; No token required
+        <i class="fas fa-shield-alt"></i> Stream from HH888 &bull; Using iframe with token
     </div>
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
 
     <script>
+        // ================================================================
+        //  🔑 TOKEN ថ្មីរបស់អូន
+        // ================================================================
+        const TOKEN = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0eXBlIjoicGxheSIsImV4cCI6MTc4ODQyNzY0NCwidXNlcm5hbWUiOiJBQlBQR0JHRzI2MiIsInVzZXJJZCI6NTU0NTIzMCwiaWF0IjoxNzg4NDI3NTg0fQ.N0Ui9D2lfnVevbp7JHR-4zEZEssRzpwGFxr53Gd6EM8';
+
+        // ================================================================
+        //  📺 STREAM URL
+        // ================================================================
+        const STREAM_URL = `https://cc.realtimevideo.cc/live/chgw24?origin=sb24&token=${TOKEN}`;
+
         // ================================================================
         //  DOM ELEMENTS
         // ================================================================
@@ -194,8 +143,8 @@
         const timeDisplay = document.getElementById('timeDisplay');
         const fightNumber = document.getElementById('fightNumber');
         const liveStatus = document.getElementById('liveStatus');
-        const channelName = document.getElementById('channelName');
-        const urlInput = document.getElementById('streamUrl');
+        const tokenDisplay = document.getElementById('tokenDisplay');
+        const expiryDisplay = document.getElementById('expiryDisplay');
 
         // ================================================================
         //  DISPLAY TIME
@@ -213,79 +162,39 @@
         setInterval(updateTime, 1000);
 
         // ================================================================
-        //  LOAD STREAM
+        //  DISPLAY TOKEN INFO
+        // ================================================================
+        function displayTokenInfo() {
+            tokenDisplay.textContent = TOKEN.substring(0, 40) + '...';
+
+            try {
+                const payload = JSON.parse(atob(TOKEN.split('.')[1]));
+                const expDate = new Date(payload.exp * 1000);
+                const now = new Date();
+                const isExpired = now > expDate;
+
+                expiryDisplay.textContent = `⏳ ផុតកំណត់: ${expDate.toLocaleTimeString('km-KH', { hour: '2-digit', minute: '2-digit', hour12: true })}`;
+                expiryDisplay.style.color = isExpired ? '#e74c3c' : '#f39c12';
+            } catch (e) {
+                expiryDisplay.textContent = '⚠️ មិនអាចអាន Token';
+            }
+        }
+        displayTokenInfo();
+
+        // ================================================================
+        //  LOAD IFRAME
         // ================================================================
         function loadStream() {
-            const url = urlInput.value.trim();
-            if (!url) {
-                alert('សូមបិទភ្ជាប់តំណវីដេអូជាមុនសិន!');
-                return;
-            }
-
-            iframe.src = url;
-            channelName.textContent = '📺 ' + getChannelName(url);
+            iframe.src = STREAM_URL;
             liveStatus.textContent = '🔄 LOADING...';
+            console.log('📺 Loading stream:', STREAM_URL);
 
             setTimeout(() => {
-                liveStatus.textContent = '🟢 LIVE';
-            }, 3000);
-
-            const num = Math.floor(Math.random() * 90) + 100;
-            fightNumber.textContent = num;
-
-            console.log('📺 Loading stream:', url);
-        }
-
-        // ================================================================
-        //  RELOAD STREAM
-        // ================================================================
-        function reloadStream() {
-            if (iframe.src) {
-                iframe.src = iframe.src;
-                liveStatus.textContent = '🔄 RELOADING...';
-                setTimeout(() => {
-                    liveStatus.textContent = '🟢 LIVE';
-                }, 2000);
-            }
-        }
-
-        // ================================================================
-        //  GET CHANNEL NAME
-        // ================================================================
-        function getChannelName(url) {
-            const names = ['SBB', 'V168', 'PH', 'BAC', 'TD', 'W8_BAC1', 'W8_BAC2', 'W8_TD1', 'W8_TD2', 'SGMC', 'CHGW24'];
-            for (let name of names) {
-                if (url.toUpperCase().includes(name)) return name;
-            }
-            return 'Unknown';
-        }
-
-        // ================================================================
-        //  CHANNEL SELECTOR
-        // ================================================================
-        document.querySelectorAll('.channel-grid .btn').forEach(btn => {
-            btn.addEventListener('click', function() {
-                document.querySelectorAll('.channel-grid .btn').forEach(b => b.classList.remove('active'));
-                this.classList.add('active');
-
-                const url = this.dataset.url;
-                const name = this.textContent.trim();
-                channelName.textContent = name;
-                urlInput.value = url;
-
-                iframe.src = url;
-                liveStatus.textContent = '🔄 LOADING...';
-
-                setTimeout(() => {
-                    liveStatus.textContent = '🟢 LIVE';
-                }, 3000);
-
                 const num = Math.floor(Math.random() * 90) + 100;
                 fightNumber.textContent = num;
-
-                console.log('📺 Switching to:', url);
-            });
-        });
+                liveStatus.textContent = '🟢 LIVE';
+            }, 3000);
+        }
 
         // ================================================================
         //  IFRAME EVENTS
@@ -319,11 +228,10 @@
         //  KEYBOARD SHORTCUTS
         // ================================================================
         document.addEventListener('keydown', function(e) {
-            if (e.key === 'Enter') { loadStream(); }
             if (e.key === 'r' || e.key === 'R') {
                 if (e.ctrlKey || e.metaKey) return;
                 e.preventDefault();
-                reloadStream();
+                iframe.src = iframe.src;
             }
             if (e.key === 'f' || e.key === 'F') {
                 if (e.ctrlKey || e.metaKey) return;
@@ -337,17 +245,13 @@
         });
 
         // ================================================================
-        //  LOAD DEFAULT CHANNEL
+        //  INITIALIZE
         // ================================================================
-        const defaultBtn = document.querySelector('.channel-grid .btn.active');
-        if (defaultBtn) {
-            iframe.src = defaultBtn.dataset.url;
-            urlInput.value = defaultBtn.dataset.url;
-        }
+        loadStream();
 
-        console.log('✅ HH888 Live - No token required!');
-        console.log('📌 Select a channel or paste URL');
-        console.log('⌨️  Enter = Play | R = Reload | F = Fullscreen');
+        console.log('✅ HH888 Live with iframe is ready!');
+        console.log('📺 Stream URL:', STREAM_URL);
+        console.log('⌨️  R = Reload | F = Fullscreen');
     </script>
 
 </body>
