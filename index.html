@@ -3,193 +3,349 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>HH888 Live</title>
-    
-    <!-- Video.js CSS -->
-    <link href="https://vjs.zencdn.net/7.20.3/video-js.css" rel="stylesheet" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
-
+    <title>HH888 Live Stream</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { background: #0a0a0a; font-family: 'Segoe UI', Arial, sans-serif; color: #fff; min-height: 100vh; }
-        
-        .header {
+        /* ===== RESET ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #0a0a0a;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1000px;
             background: #111;
-            padding: 12px 20px;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
+        }
+
+        /* ===== HEADER ===== */
+        .header {
+            background: #0d0d1a;
+            padding: 16px 24px;
             display: flex;
             align-items: center;
             justify-content: space-between;
             border-bottom: 2px solid #222;
-            position: sticky;
-            top: 0;
-            z-index: 100;
             flex-wrap: wrap;
-            gap: 10px;
+            gap: 12px;
         }
-        .logo { display: flex; align-items: center; gap: 12px; }
-        .logo img { width: 40px; height: 40px; border-radius: 10px; background: #1a1a2e; padding: 4px; }
-        .logo h1 { font-size: 22px; font-weight: 700; background: linear-gradient(135deg, #f7971e, #ffd200); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        
-        .status { display: flex; align-items: center; gap: 10px; font-size: 13px; color: #aaa; }
-        .status .dot { width: 10px; height: 10px; border-radius: 50%; background: #2ecc71; animation: blink 1.2s infinite; display: inline-block; }
-        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.2; } }
-        .status .live-text { color: #2ecc71; font-weight: 600; }
 
-        .url-bar {
-            background: #1a1a2e;
-            padding: 12px 20px;
+        .logo {
             display: flex;
             align-items: center;
             gap: 12px;
-            border-bottom: 1px solid #222;
-            flex-wrap: wrap;
         }
-        .url-bar input {
-            flex: 1;
-            background: #0a0a0a;
-            border: 1px solid #333;
-            border-radius: 8px;
-            padding: 10px 14px;
-            color: #fff;
-            font-size: 14px;
-            min-width: 200px;
-            outline: none;
+
+        .logo img {
+            width: 44px;
+            height: 44px;
+            border-radius: 10px;
+            background: #1a1a2e;
+            padding: 4px;
         }
-        .url-bar input:focus { border-color: #f7971e; }
-        .url-bar input::placeholder { color: #555; }
-        .url-bar .btn {
-            background: #f7971e;
-            color: #0a0a0a;
-            border: none;
-            padding: 10px 24px;
-            border-radius: 8px;
+
+        .logo h1 {
+            font-size: 24px;
             font-weight: 700;
+            background: linear-gradient(135deg, #f7971e, #ffd200);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .status {
+            display: flex;
+            align-items: center;
+            gap: 10px;
             font-size: 14px;
-            cursor: pointer;
-            transition: 0.3s;
-            white-space: nowrap;
+            color: #aaa;
         }
-        .url-bar .btn:hover { background: #ffd200; transform: scale(1.02); }
-        .url-bar .btn-secondary { background: #333; color: #fff; }
-        .url-bar .btn-secondary:hover { background: #444; }
 
+        .status .dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #e74c3c;
+            display: inline-block;
+            transition: background 0.3s;
+        }
+
+        .status .dot.live {
+            background: #2ecc71;
+            animation: blink 1.2s infinite;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.2; }
+        }
+
+        .status .live-text {
+            font-weight: 600;
+            transition: color 0.3s;
+        }
+
+        .status .live-text.live {
+            color: #2ecc71;
+        }
+
+        .status .live-text.offline {
+            color: #e74c3c;
+        }
+
+        /* ===== PLAYER ===== */
         .player-wrapper {
-            background: #111;
-            margin: 0 auto;
-            max-width: 1000px;
-            border-radius: 0 0 15px 15px;
-            overflow: hidden;
+            background: #000;
+            position: relative;
         }
-        .player-wrapper video { width: 100% !important; height: auto !important; aspect-ratio: 16/9; background: #000; display: block; }
-        
-        .video-js .vjs-big-play-button {
-            background: rgba(247, 151, 30, 0.85) !important;
-            border-radius: 50% !important;
-            width: 70px !important;
-            height: 70px !important;
-            line-height: 70px !important;
-            font-size: 28px !important;
-            border: none !important;
-            top: 50% !important;
-            left: 50% !important;
-            transform: translate(-50%, -50%) !important;
-        }
-        .video-js .vjs-big-play-button:hover { background: #f7971e !important; }
 
+        .player-wrapper video {
+            width: 100%;
+            height: auto;
+            aspect-ratio: 16 / 9;
+            background: #000;
+            display: block;
+        }
+
+        /* ===== INFO BAR ===== */
         .info-bar {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 12px 20px;
+            padding: 14px 24px;
             background: #0d0d1a;
             border-top: 1px solid #222;
             flex-wrap: wrap;
             gap: 10px;
-            max-width: 1000px;
-            margin: 0 auto;
         }
-        .info-bar .channel-name { font-size: 16px; font-weight: 700; color: #ffd200; }
-        .info-bar .fight-no { background: #2c2c4a; padding: 4px 16px; border-radius: 30px; font-size: 13px; color: #aaa; }
-        .info-bar .fight-no span { color: #fff; font-weight: 700; }
 
-        .footer { text-align: center; padding: 15px; color: #555; font-size: 13px; }
+        .info-bar .channel-name {
+            font-size: 16px;
+            font-weight: 700;
+            color: #ffd200;
+        }
 
+        .info-bar .fight-no {
+            background: #2c2c4a;
+            padding: 4px 16px;
+            border-radius: 30px;
+            font-size: 13px;
+            color: #aaa;
+        }
+
+        .info-bar .fight-no span {
+            color: #fff;
+            font-weight: 700;
+        }
+
+        /* ===== FOOTER ===== */
+        .footer {
+            background: #0d0d1a;
+            text-align: center;
+            padding: 12px;
+            color: #555;
+            font-size: 12px;
+            border-top: 1px solid #1a1a2e;
+        }
+
+        .footer i {
+            margin-right: 6px;
+        }
+
+        /* ===== TOKEN INFO ===== */
+        .token-info {
+            background: #0d0d1a;
+            padding: 10px 24px;
+            border-bottom: 1px solid #1a1a2e;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .token-info .label {
+            color: #555;
+            font-size: 12px;
+        }
+
+        .token-info .value {
+            color: #888;
+            font-size: 11px;
+            word-break: break-all;
+            max-width: 600px;
+        }
+
+        .token-info .expiry {
+            color: #f39c12;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .token-info .expiry.expired {
+            color: #e74c3c;
+        }
+
+        /* ===== RESPONSIVE ===== */
         @media (max-width: 640px) {
-            .header { padding: 8px 12px; }
-            .logo h1 { font-size: 18px; }
-            .status { font-size: 11px; }
-            .url-bar { padding: 10px 12px; flex-direction: column; }
-            .url-bar input { width: 100%; font-size: 13px; }
-            .url-bar .btn { width: 100%; text-align: center; }
-            .info-bar { padding: 10px 12px; font-size: 13px; }
+            .header {
+                padding: 12px 16px;
+            }
+            .logo h1 {
+                font-size: 18px;
+            }
+            .status {
+                font-size: 12px;
+            }
+            .status .dot {
+                width: 10px;
+                height: 10px;
+            }
+            .info-bar {
+                padding: 10px 16px;
+                font-size: 13px;
+            }
+            .token-info {
+                padding: 8px 16px;
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .token-info .value {
+                max-width: 100%;
+                font-size: 10px;
+            }
+        }
+
+        /* ===== LOADING OVERLAY ===== */
+        .loading-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #0a0a0a;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            z-index: 10;
+            transition: opacity 0.5s ease;
+        }
+
+        .loading-overlay.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .loading-overlay .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid #222;
+            border-top-color: #f7971e;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin-bottom: 16px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .loading-overlay p {
+            font-size: 14px;
+            color: #888;
         }
     </style>
 </head>
 <body>
 
-    <header class="header">
-        <div class="logo">
-            <img src="https://player.cpro.uk/assets/images_v2/HH888/logo/logo.png" alt="HH888" />
-            <h1>HH888</h1>
+    <div class="container">
+        <!-- ===== HEADER ===== -->
+        <header class="header">
+            <div class="logo">
+                <img src="https://player.cpro.uk/assets/images_v2/HH888/logo/logo.png" alt="HH888" />
+                <h1>HH888</h1>
+            </div>
+            <div class="status">
+                <span class="dot" id="statusDot"></span>
+                <span class="live-text" id="liveStatus">កំពុងភ្ជាប់...</span>
+                <span id="timeDisplay" style="color:#555;font-size:12px;margin-left:5px;"></span>
+            </div>
+        </header>
+
+        <!-- ===== TOKEN INFO ===== -->
+        <div class="token-info">
+            <span class="label">🔑 Token:</span>
+            <span class="value" id="tokenDisplay">eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...</span>
+            <span class="expiry" id="expiryDisplay">⏳ ផុតកំណត់: 12:02 PM</span>
         </div>
-        <div class="status">
-            <span class="dot"></span>
-            <span class="live-text" id="liveStatus">LIVE</span>
-            <span id="timeDisplay" style="color:#555;font-size:12px;"></span>
+
+        <!-- ===== PLAYER ===== -->
+        <div class="player-wrapper">
+            <div class="loading-overlay" id="loadingOverlay">
+                <div class="spinner"></div>
+                <p>⏳ កំពុងផ្ទុកវីដេអូ...</p>
+            </div>
+            <video id="media_player" autoplay playsinline webkit-playsinline controls></video>
         </div>
-    </header>
 
-    <div class="url-bar">
-        <input type="text" id="streamUrl" placeholder="បិទភ្ជាប់តំណវីដេអូ .m3u8 នៅទីនេះ..." />
-        <button class="btn" onclick="loadStream()">▶️ ចាក់</button>
-        <button class="btn btn-secondary" onclick="clearStream()">✖ លុប</button>
+        <!-- ===== INFO BAR ===== -->
+        <div class="info-bar">
+            <span class="channel-name" id="channelName">📺 CHGW24</span>
+            <span class="fight-no">លេខគូ: <span id="fightNumber">--</span></span>
+        </div>
+
+        <!-- ===== FOOTER ===== -->
+        <div class="footer">
+            <i class="fas fa-shield-alt"></i> Stream from HH888 &bull; Using direct HLS stream
+        </div>
     </div>
 
-    <div class="player-wrapper">
-        <video id="myPlayer" class="video-js vjs-default-skin vjs-big-play-centered" controls preload="auto" autoplay muted playsinline>
-            <p class="vjs-no-js">សូមបើក JavaScript</p>
-        </video>
-    </div>
-
-    <div class="info-bar">
-        <span class="channel-name" id="currentChannel">📺 បញ្ចូល URL</span>
-        <span class="fight-no">លេខគូ: <span id="fightNumber">--</span></span>
-    </div>
-
-    <div class="footer">
-        <i class="fas fa-shield-alt"></i> Stream from HH888 &bull; Using Proxy Server
-    </div>
-
-    <script src="https://vjs.zencdn.net/7.20.3/video.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/videojs-contrib-hls@5.15.0/dist/videojs-contrib-hls.min.js"></script>
+    <!-- ===== Font Awesome ===== -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
 
     <script>
         // ================================================================
-        //  PLAYER
+        //  🔑 TOKEN របស់អូន
         // ================================================================
-        const player = videojs('myPlayer', {
-            html5: {
-                hls: {
-                    enableLowInitialPlaylist: true,
-                    smoothQualityChange: true,
-                    overrideNative: true,
-                    handleManifestRedirects: true
-                }
-            },
-            controlBar: {
-                volumePanel: { inline: false },
-                pictureInPictureToggle: true
-            }
-        });
-
-        let currentUrl = '';
+        const TOKEN = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0eXBlIjoicGxheSIsImV4cCI6MTc4ODQyMTczMiwidXNlcm5hbWUiOiJBQlBQR0JHRzI2MiIsInVzZXJJZCI6NTU0NTIzMCwiaWF0IjoxNzg4NDIxNjcyfQ.oLE3P7g4Zy0TddZaR33yaN_WdZJprBul0eqNi6tScQE';
 
         // ================================================================
-        //  TIME
+        //  📺 STREAM URL
+        // ================================================================
+        const STREAM_URL = `https://cc.realtimevideo.cc/live/chgw24?origin=sb24&token=${TOKEN}`;
+
+        // ================================================================
+        //  DOM ELEMENTS
+        // ================================================================
+        const video = document.getElementById('media_player');
+        const statusDot = document.getElementById('statusDot');
+        const liveStatus = document.getElementById('liveStatus');
+        const timeDisplay = document.getElementById('timeDisplay');
+        const loadingOverlay = document.getElementById('loadingOverlay');
+        const fightNumber = document.getElementById('fightNumber');
+        const tokenDisplay = document.getElementById('tokenDisplay');
+        const expiryDisplay = document.getElementById('expiryDisplay');
+
+        // ================================================================
+        //  DISPLAY TIME
         // ================================================================
         function updateTime() {
             const now = new Date();
-            document.getElementById('timeDisplay').textContent = '🕐 ' + now.toLocaleTimeString('km-KH', {
+            timeDisplay.textContent = '🕐 ' + now.toLocaleTimeString('km-KH', {
                 hour: '2-digit',
                 minute: '2-digit',
                 second: '2-digit',
@@ -200,112 +356,148 @@
         setInterval(updateTime, 1000);
 
         // ================================================================
-        //  LOAD STREAM VIA PROXY
+        //  DISPLAY TOKEN INFO
         // ================================================================
-        function loadStream() {
-            let url = document.getElementById('streamUrl').value.trim();
+        function displayTokenInfo() {
+            tokenDisplay.textContent = TOKEN.substring(0, 40) + '...';
 
-            if (!url) {
-                alert('សូមបិទភ្ជាប់តំណវីដេអូ .m3u8 ជាមុនសិន!');
-                return;
+            try {
+                // Decode token payload
+                const payload = JSON.parse(atob(TOKEN.split('.')[1]));
+                const expDate = new Date(payload.exp * 1000);
+                const now = new Date();
+                const isExpired = now > expDate;
+
+                expiryDisplay.textContent = `⏳ ផុតកំណត់: ${expDate.toLocaleTimeString('km-KH', { hour: '2-digit', minute: '2-digit', hour12: true })}`;
+                expiryDisplay.className = 'expiry' + (isExpired ? ' expired' : '');
+            } catch (e) {
+                expiryDisplay.textContent = '⚠️ មិនអាចអាន Token';
             }
+        }
+        displayTokenInfo();
 
-            // ===== Use proxy =====
-            const proxyUrl = `/proxy?url=${encodeURIComponent(url)}`;
-            currentUrl = proxyUrl;
+        // ================================================================
+        //  UPDATE STATUS
+        // ================================================================
+        function setStatus(text, isLive = false) {
+            liveStatus.textContent = text;
+            liveStatus.className = 'live-text' + (isLive ? ' live' : '');
+            statusDot.className = 'dot' + (isLive ? ' live' : '');
+        }
 
-            document.getElementById('currentChannel').textContent = '📺 ' + getChannelName(url);
-            document.getElementById('liveStatus').textContent = '🔄 LOADING...';
+        // ================================================================
+        //  LOAD VIDEO
+        // ================================================================
+        function loadVideo() {
+            setStatus('⏳ កំពុងផ្ទុក...', false);
+            loadingOverlay.classList.remove('hidden');
 
-            player.src({
-                src: proxyUrl,
-                type: 'application/x-mpegURL'
-            });
+            video.src = STREAM_URL;
+            video.load();
 
-            player.autoplay(true);
-            player.play().catch(err => {
+            video.play().catch(err => {
                 console.warn('Autoplay blocked:', err);
-                document.getElementById('liveStatus').textContent = '⏸️ PAUSED';
+                setStatus('▶️ ចុច Play ដើម្បីចាក់', false);
+                loadingOverlay.classList.add('hidden');
             });
+        }
 
-            setTimeout(() => {
-                const fightNo = document.getElementById('fightNumber');
-                if (fightNo.textContent === '--') {
-                    fightNo.textContent = String(Math.floor(Math.random() * 90) + 10);
+        // ================================================================
+        //  VIDEO EVENTS
+        // ================================================================
+        video.addEventListener('canplay', function() {
+            setStatus('🟢 LIVE', true);
+            loadingOverlay.classList.add('hidden');
+
+            // Update fight number
+            const num = Math.floor(Math.random() * 90) + 10;
+            fightNumber.textContent = num;
+        });
+
+        video.addEventListener('waiting', function() {
+            setStatus('⏳ កំពុងផ្ទុក...', false);
+        });
+
+        video.addEventListener('playing', function() {
+            setStatus('🟢 LIVE', true);
+            loadingOverlay.classList.add('hidden');
+        });
+
+        video.addEventListener('error', function() {
+            const error = video.error;
+            console.error('Video error:', error);
+
+            let errorMsg = '❌ កំហុសមិនស្គាល់';
+            if (error) {
+                switch (error.code) {
+                    case 1: errorMsg = '❌ ការផ្ទុកត្រូវបានបញ្ឈប់'; break;
+                    case 2: errorMsg = '❌ បញ្ហាបណ្តាញ ឬម៉ាស៊ីនមេ'; break;
+                    case 3: errorMsg = '❌ ទម្រង់វីដេអូមិនគាំទ្រ'; break;
+                    case 4: errorMsg = '❌ រកមិនឃើញវីដេអូ'; break;
+                    default: errorMsg = `❌ កំហុសលេខ ${error.code}`;
                 }
-            }, 2000);
-
-            console.log('📺 Loading via proxy:', url);
-        }
-
-        // ================================================================
-        //  CLEAR
-        // ================================================================
-        function clearStream() {
-            document.getElementById('streamUrl').value = '';
-            player.src({ src: '', type: '' });
-            document.getElementById('currentChannel').textContent = '📺 បញ្ចូល URL';
-            document.getElementById('fightNumber').textContent = '--';
-            document.getElementById('liveStatus').textContent = '⏸️ STOPPED';
-            currentUrl = '';
-        }
-
-        // ================================================================
-        //  UTILITY
-        // ================================================================
-        function getChannelName(url) {
-            const names = ['SBB', 'V168', 'PH', 'BAC', 'TD', 'W8_BAC1', 'W8_BAC2', 'W8_TD1', 'W8_TD2', 'SGMC'];
-            for (let name of names) {
-                if (url.toUpperCase().includes(name)) return name;
             }
-            return 'Unknown';
-        }
+
+            setStatus(errorMsg, false);
+            loadingOverlay.classList.add('hidden');
+        });
 
         // ================================================================
-        //  PLAYER EVENTS
+        //  FIGHT NUMBER - AUTO UPDATE
         // ================================================================
-        player.on('loadeddata', () => { document.getElementById('liveStatus').textContent = '🟢 LIVE'; });
-        player.on('error', () => { document.getElementById('liveStatus').textContent = '❌ ERROR'; });
-        player.on('waiting', () => { document.getElementById('liveStatus').textContent = '⏳ BUFFERING...'; });
-        player.on('canplay', () => { document.getElementById('liveStatus').textContent = '🟢 LIVE'; });
+        setInterval(() => {
+            const currentText = fightNumber.textContent;
+            if (currentText === '--') {
+                fightNumber.textContent = String(Math.floor(Math.random() * 90) + 10);
+            } else {
+                const num = parseInt(currentText);
+                if (!isNaN(num) && num < 200) {
+                    fightNumber.textContent = String(num + 1);
+                } else {
+                    fightNumber.textContent = String(Math.floor(Math.random() * 90) + 10);
+                }
+            }
+        }, 8000);
 
         // ================================================================
         //  KEYBOARD SHORTCUTS
         // ================================================================
         document.addEventListener('keydown', function(e) {
-            if (e.key === 'Enter') { loadStream(); }
+            // R = Reload
             if (e.key === 'r' || e.key === 'R') {
                 if (e.ctrlKey || e.metaKey) return;
                 e.preventDefault();
-                if (currentUrl) loadStream();
+                loadVideo();
             }
+            // F = Fullscreen
             if (e.key === 'f' || e.key === 'F') {
                 if (e.ctrlKey || e.metaKey) return;
                 e.preventDefault();
-                document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen();
+                if (document.fullscreenElement) {
+                    document.exitFullscreen();
+                } else {
+                    document.documentElement.requestFullscreen();
+                }
+            }
+            // Space = Play/Pause
+            if (e.key === ' ') {
+                e.preventDefault();
+                if (video.paused) {
+                    video.play();
+                } else {
+                    video.pause();
+                }
             }
         });
 
         // ================================================================
-        //  FIGHT NUMBER
+        //  INITIALIZE
         // ================================================================
-        setInterval(() => {
-            const fightNo = document.getElementById('fightNumber');
-            const currentText = fightNo.textContent;
-            if (currentText === '--') {
-                fightNo.textContent = String(Math.floor(Math.random() * 90) + 10);
-            } else {
-                const num = parseInt(currentText);
-                if (!isNaN(num) && num < 200) {
-                    fightNo.textContent = String(num + 1);
-                } else {
-                    fightNo.textContent = String(Math.floor(Math.random() * 90) + 10);
-                }
-            }
-        }, 8000);
+        loadVideo();
 
-        console.log('✅ HH888 Live with Proxy is ready!');
-        console.log('📌 Press Enter to play | R to reload | F for fullscreen');
+        console.log('✅ HH888 Live Stream is ready!');
+        console.log('📺 Stream URL:', STREAM_URL);
+        console.log('⌨️  R = Reload | F = Fullscreen | Space = Play/Pause');
     </script>
 
 </body>
