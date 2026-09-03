@@ -290,7 +290,7 @@
         <div class="token-info">
             <span class="label">🔑 Token:</span>
             <span class="value" id="tokenDisplay">eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...</span>
-            <span class="expiry" id="expiryDisplay">⏳ ផុតកំណត់: 12:02 PM</span>
+            <span class="expiry" id="expiryDisplay">⏳ ផុតកំណត់: 03:01 PM</span>
         </div>
 
         <!-- ===== PLAYER ===== -->
@@ -319,9 +319,9 @@
 
     <script>
         // ================================================================
-        //  🔑 TOKEN របស់អូន
+        //  🔑 TOKEN ថ្មីរបស់អូន
         // ================================================================
-        const TOKEN = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0eXBlIjoicGxheSIsImV4cCI6MTc4ODQyMTczMiwidXNlcm5hbWUiOiJBQlBQR0JHRzI2MiIsInVzZXJJZCI6NTU0NTIzMCwiaWF0IjoxNzg4NDIxNjcyfQ.oLE3P7g4Zy0TddZaR33yaN_WdZJprBul0eqNi6tScQE';
+        const TOKEN = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NTU0NTIzMCwidXNlcm5hbWUiOiJBQlBQR0JHRzI2MiIsImlhdCI6MTc4ODQyMTY3MCwiZXhwIjoxNzg4NDI1MjcwfQ.MmtZOm515ktxNRcZDpQB3l6cuYKHOzBUR3JGPPoe6YQ';
 
         // ================================================================
         //  📺 STREAM URL
@@ -362,7 +362,6 @@
             tokenDisplay.textContent = TOKEN.substring(0, 40) + '...';
 
             try {
-                // Decode token payload
                 const payload = JSON.parse(atob(TOKEN.split('.')[1]));
                 const expDate = new Date(payload.exp * 1000);
                 const now = new Date();
@@ -409,7 +408,6 @@
             setStatus('🟢 LIVE', true);
             loadingOverlay.classList.add('hidden');
 
-            // Update fight number
             const num = Math.floor(Math.random() * 90) + 10;
             fightNumber.textContent = num;
         });
@@ -430,10 +428,14 @@
             let errorMsg = '❌ កំហុសមិនស្គាល់';
             if (error) {
                 switch (error.code) {
-                    case 1: errorMsg = '❌ ការផ្ទុកត្រូវបានបញ្ឈប់'; break;
-                    case 2: errorMsg = '❌ បញ្ហាបណ្តាញ ឬម៉ាស៊ីនមេ'; break;
-                    case 3: errorMsg = '❌ ទម្រង់វីដេអូមិនគាំទ្រ'; break;
-                    case 4: errorMsg = '❌ រកមិនឃើញវីដេអូ'; break;
+                    case 1: errorMsg = '❌ ការផ្ទុកត្រូវបានបញ្ឈប់';
+                        break;
+                    case 2: errorMsg = '❌ បញ្ហាបណ្តាញ ឬម៉ាស៊ីនមេ';
+                        break;
+                    case 3: errorMsg = '❌ ទម្រង់វីដេអូមិនគាំទ្រ';
+                        break;
+                    case 4: errorMsg = '❌ រកមិនឃើញវីដេអូ';
+                        break;
                     default: errorMsg = `❌ កំហុសលេខ ${error.code}`;
                 }
             }
@@ -463,13 +465,11 @@
         //  KEYBOARD SHORTCUTS
         // ================================================================
         document.addEventListener('keydown', function(e) {
-            // R = Reload
             if (e.key === 'r' || e.key === 'R') {
                 if (e.ctrlKey || e.metaKey) return;
                 e.preventDefault();
                 loadVideo();
             }
-            // F = Fullscreen
             if (e.key === 'f' || e.key === 'F') {
                 if (e.ctrlKey || e.metaKey) return;
                 e.preventDefault();
@@ -479,7 +479,6 @@
                     document.documentElement.requestFullscreen();
                 }
             }
-            // Space = Play/Pause
             if (e.key === ' ') {
                 e.preventDefault();
                 if (video.paused) {
