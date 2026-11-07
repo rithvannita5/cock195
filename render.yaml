@@ -1,6 +1,0 @@
-services:
-  - type: web
-    name: hh888-live
-    env: static
-    staticPublishPath: .
-    buildCommand: ""
