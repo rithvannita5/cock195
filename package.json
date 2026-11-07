@@ -1,0 +1,13 @@
+{
+  "name": "stream-app",
+  "version": "1.0.0",
+  "description": "Stream player with speed control",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "http-proxy-middleware": "^2.0.6"
+  }
+}
