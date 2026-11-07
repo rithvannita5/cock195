@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="km">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live Stream Player</title>
+    <style>
+        body { background-color: #1a1a1a; color: white; font-family: sans-serif; text-align: center; padding: 20px; }
+        video { width: 100%; max-width: 800px; border: 2px solid #333; border-radius: 8px; margin-bottom: 20px; }
+        .controls { margin-top: 10px; }
+        button { padding: 10px 20px; margin: 5px; font-size: 16px; cursor: pointer; background-color: #007bff; color: white; border: none; border-radius: 5px; }
+        button:hover { background-color: #0056b3; }
+    </style>
+</head>
+<body>
+
+    <h2>Live Stream (Speed Control)</h2>
+
+    <video id="myVideo" controls autoplay muted>
+        <!-- ដាក់ Link Stream ពិតប្រាកដនៅទីនេះ (ឧទាហរណ៍ /proxy-stream/index.m3u8) -->
+        <source src="/proxy-stream/index.m3u8" type="application/x-mpegURL"> 
+    </video>
+
+    <div class="controls">
+        <span>ល្បឿន៖ </span>
+        <button onclick="setSpeed(0.5)">0.5x</button>
+        <button onclick="setSpeed(1)">1x (ធម្មតា)</button>
+        <button onclick="setSpeed(1.5)">1.5x</button>
+        <button onclick="setSpeed(2)">2x</button>
+    </div>
+
+    <script>
+        const video = document.getElementById('myVideo');
+
+        function setSpeed(speed) {
+            video.playbackRate = speed;
+        }
+    </script>
+
+</body>
+</html>
